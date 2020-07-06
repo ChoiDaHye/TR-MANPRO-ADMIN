@@ -3,6 +3,7 @@ package dao;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -22,6 +23,8 @@ import models.m_customer_result;
 public class dao_customer {
     
     public String path = System.getProperty("user.home") + "\\Documents\\vcd-data\\data\\customer.json";
+    public String sact = System.getProperty("user.home") + "\\Documents\\vcd-data\\struk\\customer\\account\\";    
+    public String srst = System.getProperty("user.home") + "\\Documents\\vcd-data\\struk\\customer\\reset\\";   
     
     public List<m_customer> readCustomer() {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -74,6 +77,7 @@ public class dao_customer {
             String new_alamat = gs.getAlamat();
             String new_user = gs.getUsername();
             String new_pass = md5(gs.getPassword());
+            String new_pass2 = gs.getPassword();
             String new_cat = gs.getCreatedAt();
             String new_eat = gs.getEditedAt();
 
@@ -108,6 +112,7 @@ public class dao_customer {
 
             try (Writer writer = new FileWriter(path)) {
                 gson.toJson(rs, writer);
+                struk(sact, new_user, new_pass2, new_cat, "C" + String.format("%04d", i));
             } catch (Exception e) {
             }
 
@@ -183,7 +188,7 @@ public class dao_customer {
             br = new BufferedReader(new FileReader(path));
             m_customer_result rs = gson.fromJson(br, m_customer_result.class);
             List<m_customer> data = new ArrayList<m_customer>();
-            int i = 1;
+            String i = "";
 
             String param = gs.getIdCustomer();
             String new_user = gs.getUsername();
@@ -199,13 +204,14 @@ public class dao_customer {
                         data.add(new m_customer(k.getIdCustomer(), k.getNama(), k.getNoKtp(), k.getKontak(), k.getAlamat(), k.getUsername(), k.getPassword(), k.getCreatedAt(), k.getEditedAt()));
                     }
 
-                    i = (Integer) Integer.parseInt(k.getIdCustomer().substring(1)) + 1;
+                    i = k.getIdCustomer();
                 }
             }
 
             rs = new m_customer_result(data);
             try (Writer writer = new FileWriter(path);) {
                 gson.toJson(rs, writer);
+                struk(srst, new_user, new_user, new_eat, i);
             } catch (Exception e) {
             }
 
@@ -289,5 +295,21 @@ public class dao_customer {
         }
 
         return hashtext;
+    }
+    
+    void struk(String pt, String u, String p, String d, String i){
+        d = d.replace('/','-');
+        try {
+            BufferedWriter bw = new BufferedWriter(new FileWriter(pt + i + " " + d + ".txt"));
+            bw.write("==========================="); bw.newLine();
+            bw.write("    HOME CINEMA ACCOUNT    "); bw.newLine();
+            bw.write("==========================="); bw.newLine();
+            bw.write("Username: " + u); bw.newLine();
+            bw.write("Password: " + p); bw.newLine();
+            bw.write("===========================");
+            bw.close();
+        } catch (IOException e) {
+            System.out.println(e);
+        }
     }
 }
