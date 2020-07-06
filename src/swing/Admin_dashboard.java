@@ -9,12 +9,15 @@ import javax.swing.table.DefaultTableModel;
 import dao.*;
 import java.awt.HeadlessException;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableRowSorter;
 import models.m_customer;
 import models.m_harga;
 import models.m_karyawan;
+import models.m_vcd;
 
 public class Admin_dashboard extends javax.swing.JFrame {
 
@@ -22,7 +25,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
 
     //for param
     String d_id_vcd, d_id_customer, d_id_karyawan, d_id_harga, p_id_customer;
-    
+
     //for indentity
     String log_id, log_name, log_level;
 
@@ -172,6 +175,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
         frameNonactive(lp_keluar);
 
         jLabel8.setText("<html>Disini kamu bisa melihat data diri dan akun kamu</html>");
+        profil_tampil();
     }
 
     private void vcd() {
@@ -198,6 +202,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
         frameNonactive(lp_laporan);
         frameNonactive(lp_keluar);
 
+        vcd_tampil();
         jLabel10.setText("<html>Toko kita punya banyak VCD, cari tahu apa saja yang kita punya</html>");
     }
 
@@ -320,6 +325,109 @@ public class Admin_dashboard extends javax.swing.JFrame {
         frameNonactive(lp_karyawan);
         frameNonactive(lp_laporan);
         frameActive(lp_keluar);
+    }
+    // METHOD VCD
+    void vcd_tampil() {
+        Object[] baris = {"ID", "JUDUL", "RILIS", "GENRE", "BAHASA", "BAIK", "BURUK"};
+        DefaultTableModel dt = new DefaultTableModel(null, baris);
+        tb_vcd.setModel(dt);
+
+        try {
+            dao_vcd dao = new dao_vcd();
+            List<m_vcd> data = dao.readVcd();
+
+            for (m_vcd d : data) {
+                String baik = Integer.toString(d.getKondisi_baik());
+                String buruk = Integer.toString(d.getKondisi_buruk());   
+                String[] isi = {d.getId_vcd(), d.getJudul(), d.getRilis(), d.getGenre(), d.getBahasa(), baik, buruk};
+                dt.addRow(isi);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    void tb_vcd_klik() {
+        int row = tb_vcd.getSelectedRow();
+        d_id_vcd = tb_vcd.getModel().getValueAt(row, 0).toString();
+    }
+    void vcd_hapus(String param) {
+        try {
+            dao_vcd dao = new dao_vcd();
+            m_vcd data = new m_vcd();
+            data.setId_vcd(param);
+
+            if (dao.deleteVcd(data)) {
+                JOptionPane.showMessageDialog(null, "Data berhasil dihapus!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, data gagal dihapus!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menghapus data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    // METHOD PROFIL
+    void profil_tampil() {
+        try {
+            dao_karyawan dao = new dao_karyawan();
+            List<m_karyawan> data = dao.readKaryawan();
+
+            for (m_karyawan d : data) {
+                if (d.getIdKaryawan().equals(log_id)) {
+                    profile_txt_ktp.setText(d.getNoKtp());
+                    System.out.println(d.getNoKtp());
+                    profile_txt_nama.setText(d.getNama());
+                    profile_txt_kontak.setText(d.getKontak());
+                    profile_txt_alamat.setText(d.getAlamat());
+                    profile_txt_level.setText(d.getLevel());
+                    System.out.println(d.getLevel());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    void profil_edit(String nama, String kontak, String alamat) {
+        try {
+            dao_karyawan dao = new dao_karyawan();
+            m_karyawan data = new m_karyawan();
+            String date = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+
+            data.setIdKaryawan(log_id);
+            data.setNama(nama);
+            data.setKontak(kontak);
+            data.setAlamat(alamat);
+            data.setEditedAt(date);
+
+            if (dao.editProfile(data)) {
+                JOptionPane.showMessageDialog(null, "Data berhasil tersimpan!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, data gagal tersimpan!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menyimpan data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    void ganti_password(String old, String now) {
+        try {
+            dao_karyawan dao = new dao_karyawan();
+            m_karyawan data = new m_karyawan();
+            String date = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+
+            data.setIdKaryawan(log_id);
+            data.setPassword(old);
+            data.setEditedAt(date);
+
+            if (dao.ganti_password(data, now)) {
+                JOptionPane.showMessageDialog(null, "Data berhasil tersimpan!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, data gagal tersimpan!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menyimpan data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     // METHOD CUSTOMER
@@ -471,10 +579,10 @@ public class Admin_dashboard extends javax.swing.JFrame {
         log_id = id;
         log_name = nama;
         log_level = level;
-        
+
         dashboard();
     }
-    
+
     public Admin_dashboard() {
         initComponents();
     }
@@ -1944,6 +2052,11 @@ public class Admin_dashboard extends javax.swing.JFrame {
 
         jButton2.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         jButton2.setText("Simpan");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         profile_btn_ganti.setFont(new java.awt.Font("Tahoma", 0, 14)); // NOI18N
         profile_btn_ganti.setText("Ganti password");
@@ -1976,15 +2089,14 @@ public class Admin_dashboard extends javax.swing.JFrame {
                         .addGap(18, 18, 18)
                         .addGroup(profileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(profile_btn_ganti, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(profileLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(profile_txt_nama, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
-                                .addComponent(profile_txt_ktp, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
-                                .addComponent(profile_txt_level, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
-                                .addComponent(profile_txt_kontak, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
-                                .addComponent(profile_txt_pass_old)
-                                .addComponent(profile_txt_pass_new)
-                                .addComponent(profile_txt_alamat)))))
+                            .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(profile_txt_nama, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                            .addComponent(profile_txt_ktp, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
+                            .addComponent(profile_txt_level, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                            .addComponent(profile_txt_kontak, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
+                            .addComponent(profile_txt_pass_old)
+                            .addComponent(profile_txt_pass_new)
+                            .addComponent(profile_txt_alamat))))
                 .addContainerGap(514, Short.MAX_VALUE))
         );
 
@@ -2050,12 +2162,17 @@ public class Admin_dashboard extends javax.swing.JFrame {
         tb_vcd.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         tb_vcd.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"V001", "Spider-Man: Far from Home", "02/07/2019", "Action, Adventure, Sci-Fi", "English", "10", "0"}
+
             },
             new String [] {
                 "ID", "Judul", "Rilis", "Genre", "Bahasa", "Baik", "Buruk"
             }
         ));
+        tb_vcd.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tb_vcdMouseClicked(evt);
+            }
+        });
         jScrollPane6.setViewportView(tb_vcd);
         if (tb_vcd.getColumnModel().getColumnCount() > 0) {
             tb_vcd.getColumnModel().getColumn(1).setMinWidth(100);
@@ -2069,9 +2186,19 @@ public class Admin_dashboard extends javax.swing.JFrame {
         vcd_btn_tambah.setBackground(new java.awt.Color(204, 204, 204));
         vcd_btn_tambah.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204), 2));
         vcd_btn_tambah.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        vcd_btn_tambah.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                vcd_btn_tambahMouseClicked(evt);
+            }
+        });
 
         jLabel83.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         jLabel83.setText("Tambah");
+        jLabel83.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel83MouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout vcd_btn_tambahLayout = new javax.swing.GroupLayout(vcd_btn_tambah);
         vcd_btn_tambah.setLayout(vcd_btn_tambahLayout);
@@ -2093,9 +2220,19 @@ public class Admin_dashboard extends javax.swing.JFrame {
         vcd_btn_edit.setBackground(new java.awt.Color(204, 204, 204));
         vcd_btn_edit.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204), 2));
         vcd_btn_edit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        vcd_btn_edit.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                vcd_btn_editMouseClicked(evt);
+            }
+        });
 
         jLabel84.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         jLabel84.setText("Edit");
+        jLabel84.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel84MouseClicked(evt);
+            }
+        });
 
         javax.swing.GroupLayout vcd_btn_editLayout = new javax.swing.GroupLayout(vcd_btn_edit);
         vcd_btn_edit.setLayout(vcd_btn_editLayout);
@@ -2117,6 +2254,11 @@ public class Admin_dashboard extends javax.swing.JFrame {
         vcd_btn_hapus.setBackground(new java.awt.Color(204, 204, 204));
         vcd_btn_hapus.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204), 2));
         vcd_btn_hapus.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        vcd_btn_hapus.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                vcd_btn_hapusMouseClicked(evt);
+            }
+        });
 
         jLabel85.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
         jLabel85.setText("Hapus");
@@ -3000,8 +3142,83 @@ public class Admin_dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_tb_hargaMouseClicked
 
     private void profile_btn_gantiActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_profile_btn_gantiActionPerformed
-        // TODO add your handling code here:
+        String old = profile_txt_pass_old.getText(), now = profile_txt_pass_new.getText();
+
+        if (old.isEmpty() || now.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Mohon lengkapi data!", "Peringatan", JOptionPane.ERROR_MESSAGE);
+
+            if (old.isEmpty()) {
+                profile_txt_pass_old.requestFocus();
+            } else if (now.isEmpty()) {
+                profile_txt_pass_new.requestFocus();
+            }
+        } else {
+            int selection = JOptionPane.showConfirmDialog(null, "Simpan perubahan?", "Konfirmasi", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (selection == JOptionPane.OK_OPTION) {
+                ganti_password(old, now);
+            }
+        }        // TODO add your
     }//GEN-LAST:event_profile_btn_gantiActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        String nama = profile_txt_nama.getText(), kontak = profile_txt_kontak.getText(), alamat = profile_txt_alamat.getText();
+
+        if (nama.isEmpty() || kontak.isEmpty() || alamat.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Mohon lengkapi data!", "Peringatan", JOptionPane.ERROR_MESSAGE);
+
+            if (nama.isEmpty()) {
+                profile_txt_nama.requestFocus();
+            } else if (kontak.isEmpty()) {
+                profile_txt_kontak.requestFocus();
+            } else if (alamat.isEmpty()) {
+                profile_txt_alamat.requestFocus();
+            }
+        } else {
+            int selection = JOptionPane.showConfirmDialog(null, "Simpan perubahan?", "Konfirmasi", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (selection == JOptionPane.OK_OPTION) {
+                profil_edit(nama, kontak, alamat);
+            }
+        }        // TODO add your handling code here:
+    }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void vcd_btn_tambahMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vcd_btn_tambahMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_vcd_btn_tambahMouseClicked
+
+    private void jLabel83MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel83MouseClicked
+    Vcd_add tambah = new Vcd_add();
+    tambah.setVisible(true);        // TODO add your handling code here:
+    }//GEN-LAST:event_jLabel83MouseClicked
+
+    private void jLabel84MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel84MouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jLabel84MouseClicked
+
+    private void vcd_btn_editMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vcd_btn_editMouseClicked
+    if (d_id_vcd == null) {
+            JOptionPane.showMessageDialog(null, "Mohon pilih dahulu data yang akan diedit pada tabel!", "Oops", JOptionPane.WARNING_MESSAGE);
+        } else {
+            Vcd_edit edit = new Vcd_edit(d_id_vcd);
+            edit.setVisible(true);
+            d_id_vcd = null;
+        }      // TODO add your handling code here:
+    }//GEN-LAST:event_vcd_btn_editMouseClicked
+
+    private void vcd_btn_hapusMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vcd_btn_hapusMouseClicked
+    if (d_id_vcd == null) {
+            JOptionPane.showMessageDialog(null, "Mohon pilih dahulu data yang akan diedit pada tabel!", "Oops", JOptionPane.WARNING_MESSAGE);
+        } else {
+            int selection = JOptionPane.showConfirmDialog(null, "Hapus data?", "Konfirmasi", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (selection == JOptionPane.OK_OPTION) {
+                vcd_hapus(d_id_vcd);
+                d_id_vcd = null;
+            }
+        }        // TODO add your handling code here:
+    }//GEN-LAST:event_vcd_btn_hapusMouseClicked
+
+    private void tb_vcdMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tb_vcdMouseClicked
+    tb_vcd_klik();            // TODO add your handling code here:
+    }//GEN-LAST:event_tb_vcdMouseClicked
 
     /**
      * @param args the command line arguments

@@ -3,10 +3,24 @@ package models;
 import java.util.Date;
 
 public class m_vcd {
-    private String id_vcd, judul, genre, bahasa, poster, id_harga;
-    private Date rilis;
+    private String id_vcd, judul, genre, bahasa, poster, id_harga, rilis;
     private int kondisi_baik, kondisi_buruk;
 
+    public m_vcd(String id_vcd, String judul, String genre, String bahasa, String poster, String id_harga, String rilis, int kondisi_baik, int kondisi_buruk) {
+        this.id_vcd = id_vcd;
+        this.judul = judul;
+        this.genre = genre;
+        this.bahasa = bahasa;
+        this.poster = poster;
+        this.id_harga = id_harga;
+        this.rilis = rilis;
+        this.kondisi_baik = kondisi_baik;
+        this.kondisi_buruk = kondisi_buruk;
+    }
+
+    public m_vcd() {
+    }
+    
     public String getId_vcd() {
         return id_vcd;
     }
@@ -55,13 +69,14 @@ public class m_vcd {
         this.id_harga = id_harga;
     }
 
-    public Date getRilis() {
+    public String getRilis() {
         return rilis;
     }
 
-    public void setRilis(Date rilis) {
+    public void setRilis(String rilis) {
         this.rilis = rilis;
     }
+
 
     public int getKondisi_baik() {
         return kondisi_baik;

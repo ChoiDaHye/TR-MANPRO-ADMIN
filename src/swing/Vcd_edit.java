@@ -5,18 +5,89 @@
  */
 package swing;
 
+import dao.dao_vcd;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import javax.swing.JOptionPane;
+import models.m_vcd;
+
 /**
  *
  * @author dgeda
  */
 public class Vcd_edit extends javax.swing.JFrame {
 
+    String param, iden;
+
     /**
      * Creates new form Customer_add
+     *
+     * @param id
      */
-    public Vcd_edit() {
+    public Vcd_edit(String id) {
         initComponents();
         jPanel1.setFocusable(true);
+        param = id;
+        vcd_tampil();
+    }
+
+    private Vcd_edit() {
+        initComponents();
+        jPanel1.setFocusable(true);
+    }
+
+    void vcd_tampil() {
+        try {
+            dao_vcd dao = new dao_vcd();
+            List<m_vcd> data = dao.readVcd();
+
+            for (m_vcd d : data) {
+                if (d.getId_vcd().equals(param)) {
+                    vcd_edit_judul.setText(d.getJudul());
+                    vcd_edit_bahasa.setText(d.getBahasa());
+                    vcd_edit_rilis.setText(d.getRilis());
+                    vcd_edit_poster.setText(d.getPoster());
+//                    vcd_edit_harga.setSelectedItem(0);
+//                    iden = d.getNama().toLowerCase();
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    void vcd_edit(String judul, String genre, String bahasa, String poster, String id_harga, String rilis) {
+        try {
+            dao_vcd dao = new dao_vcd();
+            m_vcd data = new m_vcd();
+            String date = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+
+            data.setJudul(judul);
+            data.setGenre(genre);
+            data.setBahasa(bahasa);
+            data.setPoster(poster);
+            data.setId_harga(id_harga);
+            data.setRilis(rilis);
+
+            if (dao.editVcd(data)) {
+                JOptionPane.showMessageDialog(null, "Data berhasil tersimpan!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+
+                vcd_edit_judul.setText("");
+                vcd_edit_bahasa.setText("");
+                vcd_edit_genre.setText("");
+                vcd_edit_harga.setSelectedItem(0);
+                vcd_edit_poster.setText("");
+                vcd_edit_rilis.setText("");
+
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, data gagal tersimpan!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menyimpan data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -97,6 +168,11 @@ public class Vcd_edit extends javax.swing.JFrame {
         vcd_edit_bahasa.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
         vcd_btn_simpan.setBackground(new java.awt.Color(0, 120, 215));
+        vcd_btn_simpan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                vcd_btn_simpanMouseClicked(evt);
+            }
+        });
 
         jLabel73.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
         jLabel73.setForeground(new java.awt.Color(255, 255, 255));
@@ -125,6 +201,11 @@ public class Vcd_edit extends javax.swing.JFrame {
 
         vcd_edit_poster.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         vcd_edit_poster.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
+        vcd_edit_poster.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                vcd_edit_posterActionPerformed(evt);
+            }
+        });
 
         jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel10.setForeground(new java.awt.Color(93, 93, 93));
@@ -218,6 +299,35 @@ public class Vcd_edit extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void vcd_edit_posterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vcd_edit_posterActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_vcd_edit_posterActionPerformed
+
+    private void vcd_btn_simpanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vcd_btn_simpanMouseClicked
+        String judul = vcd_edit_judul.getText(), bahasa = vcd_edit_bahasa.getText(), rilis = vcd_edit_rilis.getText(), poster = vcd_edit_poster.getText(), genre = vcd_edit_genre.getText();
+        String id_harga = "0";
+        if (judul.isEmpty() || bahasa.isEmpty() || rilis.isEmpty() || poster.isEmpty() || genre.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Mohon lengkapi data!", "Peringatan", JOptionPane.ERROR_MESSAGE);
+
+            if (judul.isEmpty()) {
+                vcd_edit_judul.requestFocus();
+            } else if (bahasa.isEmpty()) {
+                vcd_edit_bahasa.requestFocus();
+            } else if (rilis.isEmpty()) {
+                vcd_edit_rilis.requestFocus();
+            } else if (genre.isEmpty()) {
+                vcd_edit_genre.requestFocus();
+            } else if (poster.isEmpty()) {
+                vcd_edit_poster.requestFocus();
+            }
+        } else {
+            int selection = JOptionPane.showConfirmDialog(null, "Simpan data?", "Konfirmasi", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (selection == JOptionPane.OK_OPTION) {
+                vcd_edit(judul, genre, bahasa, poster, id_harga, rilis);
+            }
+        }        // TODO add your handling code here:
+    }//GEN-LAST:event_vcd_btn_simpanMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -258,7 +368,9 @@ public class Vcd_edit extends javax.swing.JFrame {
                 new Vcd_edit().setVisible(true);
             }
         });
+
     }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;

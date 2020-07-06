@@ -5,6 +5,13 @@
  */
 package swing;
 
+import dao.dao_vcd;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import javax.swing.JOptionPane;
+import models.m_vcd;
+
 /**
  *
  * @author dgeda
@@ -17,6 +24,39 @@ public class Vcd_add extends javax.swing.JFrame {
     public Vcd_add() {
         initComponents();
         jPanel1.setFocusable(true);
+    }
+
+    void vcd_tambah(String judul, String genre, String bahasa, String poster, String id_harga, String rilis, int kondisi_baik, int kondisi_buruk) {
+        try {
+            dao_vcd dao = new dao_vcd();
+            m_vcd data = new m_vcd();
+            String date = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+
+            data.setJudul(judul);
+            data.setGenre(genre);
+            data.setBahasa(bahasa);
+            data.setPoster(poster);
+            data.setId_harga(id_harga);
+            data.setRilis(rilis);
+            data.setKondisi_baik(kondisi_baik);
+            data.setKondisi_buruk(kondisi_buruk);
+
+            if (dao.insertVcd(data)) {
+                JOptionPane.showMessageDialog(null, "Data berhasil tersimpan!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+
+                vcd_add_judul.setText("");
+                vcd_add_bahasa.setText("");
+                vcd_add_genre.setText("");
+                vcd_add_jumlah.setText("");
+                vcd_add_poster.setText("");
+                vcd_add_rilis.setText("");
+
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, data gagal tersimpan!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menyimpan data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -99,6 +139,11 @@ public class Vcd_add extends javax.swing.JFrame {
         vcd_add_bahasa.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
         vcd_btn_simpan.setBackground(new java.awt.Color(0, 120, 215));
+        vcd_btn_simpan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                vcd_btn_simpanMouseClicked(evt);
+            }
+        });
 
         jLabel73.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
         jLabel73.setForeground(new java.awt.Color(255, 255, 255));
@@ -235,6 +280,35 @@ public class Vcd_add extends javax.swing.JFrame {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+    private void vcd_btn_simpanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vcd_btn_simpanMouseClicked
+        String judul = vcd_add_judul.getText(), bahasa = vcd_add_bahasa.getText(), rilis = vcd_add_rilis.getText(), jumlah= vcd_add_jumlah.getText(), poster = vcd_add_poster.getText(), genre = vcd_add_genre.getText();   
+        int baik = Integer.parseInt(vcd_add_jumlah.getText());
+        int buruk = 0;
+        String id_harga = "0";
+        if (judul.isEmpty() || bahasa.isEmpty() || rilis.isEmpty() || jumlah.isEmpty() || poster.isEmpty() || genre.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Mohon lengkapi data!", "Peringatan", JOptionPane.ERROR_MESSAGE);
+
+            if (judul.isEmpty()) {
+                vcd_add_judul.requestFocus();
+            } else if (bahasa.isEmpty()) {
+                vcd_add_bahasa.requestFocus();
+            } else if (rilis.isEmpty()) {
+                vcd_add_rilis.requestFocus();
+            } else if (jumlah.isEmpty()) {
+                vcd_add_jumlah.requestFocus();
+            } else if (genre.isEmpty()) {
+                vcd_add_genre.requestFocus();
+            } else if (poster.isEmpty()) {
+                vcd_add_poster.requestFocus();
+            }
+        } else {
+            int selection = JOptionPane.showConfirmDialog(null, "Simpan data?", "Konfirmasi", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+            if (selection == JOptionPane.OK_OPTION) {
+                vcd_tambah(judul, genre, bahasa, poster, id_harga, rilis, baik, buruk);
+            }
+        }        // TODO add your handling code here:
+    }//GEN-LAST:event_vcd_btn_simpanMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -272,6 +346,7 @@ public class Vcd_add extends javax.swing.JFrame {
             }
         });
     }
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;

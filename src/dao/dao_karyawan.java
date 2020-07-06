@@ -46,7 +46,7 @@ public class dao_karyawan {
                         String level = k.getLevel();
                         String cat = k.getCreatedAt();
                         String eat = k.getEditedAt();
-                        
+
                         data.add(new m_karyawan(id, nama, ktp, kontak, alamat, level, user, pass, cat, eat));
                     }
                 }
@@ -219,6 +219,55 @@ public class dao_karyawan {
 
         return false;
     }
+    
+    public boolean editProfile(m_karyawan gs) throws IOException {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        BufferedReader br = null;
+
+        try {
+            br = new BufferedReader(new FileReader(path));
+            m_karyawan_result rs = gson.fromJson(br, m_karyawan_result.class);
+            List<m_karyawan> data = new ArrayList<m_karyawan>();
+            int i = 1;
+
+            String param = gs.getIdKaryawan();
+            String new_nama = gs.getNama();
+            String new_kontak = gs.getKontak();
+            String new_alamat = gs.getAlamat();
+            String new_eat = gs.getEditedAt();
+
+            if (rs != null) {
+                for (m_karyawan k : rs.getKaryawan()) {
+                    if (k.getIdKaryawan().equals(param)) {
+                        String id = k.getIdKaryawan();
+                        data.add(new m_karyawan(id, new_nama, k.getNoKtp(), new_kontak, new_alamat, k.getLevel(), k.getUsername(), k.getPassword(), k.getCreatedAt(), new_eat));
+                    } else {
+                        data.add(new m_karyawan(k.getIdKaryawan(), k.getNama(), k.getNoKtp(), k.getKontak(), k.getAlamat(), k.getLevel(), k.getUsername(), k.getPassword(), k.getCreatedAt(), k.getEditedAt()));
+                    }
+
+                    i = (Integer) Integer.parseInt(k.getIdKaryawan().substring(1)) + 1;
+                }
+            }
+
+            rs = new m_karyawan_result(data);
+            try (Writer writer = new FileWriter(path);) {
+                gson.toJson(rs, writer);
+            } catch (Exception e) {
+            }
+
+            return true;
+        } catch (FileNotFoundException e) {
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+        return false;
+    }
 
     public boolean resetKaryawan(m_karyawan gs) throws IOException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -318,6 +367,56 @@ public class dao_karyawan {
         return false;
     }
 
+    public Boolean ganti_password(m_karyawan gs, String now) throws IOException {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        BufferedReader br = null;
+
+        try {
+            br = new BufferedReader(new FileReader(path));
+            m_karyawan_result rs = gson.fromJson(br, m_karyawan_result.class);
+            List<m_karyawan> data = new ArrayList<m_karyawan>();
+
+            String param = gs.getIdKaryawan();
+            String oldPass = md5(gs.getPassword());
+            String newPass = md5(now);
+            String newDate = gs.getEditedAt();
+
+            if (rs != null) {
+                for (m_karyawan k : rs.getKaryawan()) {
+                    if (k.getIdKaryawan().equals(param) && k.getPassword().equals(oldPass)) {
+                        String id = k.getIdKaryawan();
+                        String nama = k.getNama();
+                        String ktp = k.getNoKtp();
+                        String kontak = k.getKontak();
+                        String alamat = k.getAlamat();
+                        String level = k.getLevel();
+                        String user = k.getUsername();
+                        String cat = k.getCreatedAt();
+
+                        data.add(new m_karyawan(id, nama, ktp, kontak, alamat, level, user, newPass, cat, newDate));
+                    }
+                }
+            }
+
+            rs = new m_karyawan_result(data);
+            try (Writer writer = new FileWriter(path);) {
+                gson.toJson(rs, writer);
+            } catch (Exception e) {
+            }
+
+            return true;
+        } catch (FileNotFoundException e) {
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+        return false;
+    }
+
     public String md5(String teks) {
         String hashtext = "";
 
@@ -336,4 +435,5 @@ public class dao_karyawan {
 
         return hashtext;
     }
+
 }
