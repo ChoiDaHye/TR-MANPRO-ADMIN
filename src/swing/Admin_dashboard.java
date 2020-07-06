@@ -7,7 +7,6 @@ import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.table.DefaultTableModel;
 import dao.*;
-import java.awt.HeadlessException;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -28,6 +27,248 @@ public class Admin_dashboard extends javax.swing.JFrame {
 
     //for indentity
     String log_id, log_name, log_level;
+
+    // METHOD PROFIL
+    void profil_tampil() {
+        try {
+            dao_karyawan dao = new dao_karyawan();
+            List<m_karyawan> data = dao.readKaryawan();
+
+            for (m_karyawan d : data) {
+                if (d.getIdKaryawan().equals(log_id)) {
+                    profile_txt_ktp.setText(d.getNoKtp());
+                    profile_txt_nama.setText(d.getNama());
+                    profile_txt_kontak.setText(d.getKontak());
+                    profile_txt_alamat.setText(d.getAlamat());
+                    profile_txt_level.setText(d.getLevel());
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    void profil_edit(String nama, String kontak, String alamat) {
+        try {
+            dao_karyawan dao = new dao_karyawan();
+            m_karyawan data = new m_karyawan();
+            String date = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+
+            data.setIdKaryawan(log_id);
+            data.setNama(nama);
+            data.setKontak(kontak);
+            data.setAlamat(alamat);
+            data.setEditedAt(date);
+
+            if (dao.editProfile(data)) {
+                JOptionPane.showMessageDialog(null, "Data berhasil tersimpan!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, data gagal tersimpan!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menyimpan data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    void ganti_password(String old, String now) {
+        try {
+            dao_karyawan dao = new dao_karyawan();
+            m_karyawan data = new m_karyawan();
+            String date = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+
+            data.setIdKaryawan(log_id);
+            data.setPassword(old);
+            data.setEditedAt(date);
+
+            if (dao.ganti_password(data, now)) {
+                JOptionPane.showMessageDialog(null, "Data berhasil tersimpan!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, data gagal tersimpan!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menyimpan data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // METHOD VCD
+    void vcd_tampil() {
+        Object[] baris = {"ID", "JUDUL", "RILIS", "GENRE", "BAHASA", "BAIK", "BURUK", "TERPINJAM"};
+        DefaultTableModel dt = new DefaultTableModel(null, baris);
+        tb_vcd.setModel(dt);
+
+        try {
+            dao_vcd dao = new dao_vcd();
+            List<m_vcd> data = dao.readVcd();
+
+            for (m_vcd d : data) {
+                String baik = Integer.toString(d.getKondisi_baik());
+                String buruk = Integer.toString(d.getKondisi_buruk());
+                String pinjam = Integer.toString(d.getTerpinjam());
+                String[] isi = {d.getId_vcd(), d.getJudul(), d.getRilis(), d.getGenre(), d.getBahasa(), baik, buruk, pinjam};
+                dt.addRow(isi);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    void tb_vcd_klik() {
+        int row = tb_vcd.getSelectedRow();
+        d_id_vcd = tb_vcd.getModel().getValueAt(row, 0).toString();
+    }
+
+    void vcd_hapus(String param) {
+        try {
+            dao_vcd dao = new dao_vcd();
+            m_vcd data = new m_vcd();
+            data.setId_vcd(param);
+
+            if (dao.deleteVcd(data)) {
+                JOptionPane.showMessageDialog(null, "Data berhasil dihapus!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, data gagal dihapus!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menghapus data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // METHOD CUSTOMER
+    void customer_tampil() {
+        Object[] baris = {"ID", "NAMA", "NOMOR KTP", "ALAMAT", "KONTAK"};
+        DefaultTableModel dt = new DefaultTableModel(null, baris);
+        tb_customer.setModel(dt);
+
+        try {
+            dao_customer dao = new dao_customer();
+            List<m_customer> data = dao.readCustomer();
+
+            for (m_customer d : data) {
+                String[] isi = {d.getIdCustomer(), d.getNama(), d.getNoKtp(), d.getAlamat(), d.getKontak()};
+                dt.addRow(isi);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    void tb_customer_klik() {
+        int row = tb_customer.getSelectedRow();
+        d_id_customer = tb_customer.getModel().getValueAt(row, 0).toString();
+    }
+
+    void tb_customer_cari(String query) {
+    }
+
+    void customer_hapus(String param) {
+        try {
+            dao_customer dao = new dao_customer();
+            m_customer data = new m_customer();
+            data.setIdCustomer(param);
+
+            if (dao.deleteKaryawan(data)) {
+                JOptionPane.showMessageDialog(null, "Data berhasil dihapus!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, data gagal dihapus!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menghapus data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // METHOD KARYAWAN
+    void karyawan_tampil() {
+        Object[] baris = {"ID", "NAMA", "NOMOR KTP", "ALAMAT", "KONTAK", "LEVEL"};
+        DefaultTableModel dt = new DefaultTableModel(null, baris);
+        tb_karyawan.setModel(dt);
+
+        try {
+            dao_karyawan dao = new dao_karyawan();
+            List<m_karyawan> data = dao.readKaryawan();
+
+            for (m_karyawan d : data) {
+                String[] isi = {d.getIdKaryawan(), d.getNama(), d.getNoKtp(), d.getAlamat(), d.getKontak(), d.getLevel()};
+                dt.addRow(isi);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    void tb_karyawan_klik() {
+        int row = tb_karyawan.getSelectedRow();
+        d_id_karyawan = tb_karyawan.getModel().getValueAt(row, 0).toString();
+    }
+
+    void tb_karyawan_cari(String query) {
+        try {
+            DefaultTableModel model = (DefaultTableModel) tb_karyawan.getModel();
+            TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>(model);
+            tb_karyawan.setRowSorter(tr);
+            tr.setRowFilter(RowFilter.regexFilter(query));
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    void karyawan_hapus(String param) {
+        try {
+            dao_karyawan dao = new dao_karyawan();
+            m_karyawan data = new m_karyawan();
+            data.setIdKaryawan(param);
+
+            if (dao.deleteKaryawan(data)) {
+                JOptionPane.showMessageDialog(null, "Data berhasil dihapus!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, data gagal dihapus!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menghapus data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+
+    // METHOD HARGA
+    void harga_tampil() {
+        Object[] baris = {"ID", "NAMA", "HARGA"};
+        DefaultTableModel dt = new DefaultTableModel(null, baris);
+        tb_harga.setModel(dt);
+
+        try {
+            dao_harga dao = new dao_harga();
+            List<m_harga> data = dao.readHarga();
+
+            for (m_harga d : data) {
+                String[] isi = {d.getIdHarga(), d.getNama(), Float.toString(d.getHarga())};
+                dt.addRow(isi);
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+
+    void tb_harga_klik() {
+        int row = tb_harga.getSelectedRow();
+        d_id_harga = tb_harga.getModel().getValueAt(row, 0).toString();
+    }
+
+    void tb_harga_cari(String query) {
+    }
+
+    void harga_hapus(String param) {
+        try {
+            dao_harga dao = new dao_harga();
+            m_harga data = new m_harga();
+            data.setIdHarga(param);
+
+            if (dao.deleteHarga(data)) {
+                JOptionPane.showMessageDialog(null, "Data berhasil dihapus!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, data gagal dihapus!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menghapus data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
+    }
 
     //for dashboard
     private void frameEnter(JPanel p) {
@@ -231,6 +472,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
         frameNonactive(lp_keluar);
 
         jLabel12.setText("<html>Daftar pelanggan toko kita ada pada tabel dibawah ini</html>");
+        customer_tampil();
     }
 
     private void karyawan() {
@@ -257,6 +499,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
         frameNonactive(lp_keluar);
 
         jLabel14.setText("<html>Daftar siapa saja yang bekerja di toko ada pada tabel dibawah ini</html>");
+        karyawan_tampil();
     }
 
     private void harga() {
@@ -284,6 +527,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
         frameNonactive(lp_keluar);
 
         jLabel101.setText("<html>Kelola harga pada toko</html>");
+        harga_tampil();
     }
 
     private void laporan() {
@@ -325,246 +569,14 @@ public class Admin_dashboard extends javax.swing.JFrame {
         frameNonactive(lp_karyawan);
         frameNonactive(lp_laporan);
         frameActive(lp_keluar);
-    }
-    // METHOD VCD
-    void vcd_tampil() {
-        Object[] baris = {"ID", "JUDUL", "RILIS", "GENRE", "BAHASA", "BAIK", "BURUK"};
-        DefaultTableModel dt = new DefaultTableModel(null, baris);
-        tb_vcd.setModel(dt);
 
-        try {
-            dao_vcd dao = new dao_vcd();
-            List<m_vcd> data = dao.readVcd();
+        log_id = null;
+        log_name = null;
+        log_level = null;
 
-            for (m_vcd d : data) {
-                String baik = Integer.toString(d.getKondisi_baik());
-                String buruk = Integer.toString(d.getKondisi_buruk());   
-                String[] isi = {d.getId_vcd(), d.getJudul(), d.getRilis(), d.getGenre(), d.getBahasa(), baik, buruk};
-                dt.addRow(isi);
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
-    void tb_vcd_klik() {
-        int row = tb_vcd.getSelectedRow();
-        d_id_vcd = tb_vcd.getModel().getValueAt(row, 0).toString();
-    }
-    void vcd_hapus(String param) {
-        try {
-            dao_vcd dao = new dao_vcd();
-            m_vcd data = new m_vcd();
-            data.setId_vcd(param);
-
-            if (dao.deleteVcd(data)) {
-                JOptionPane.showMessageDialog(null, "Data berhasil dihapus!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "Maaf, data gagal dihapus!", "Gagal", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menghapus data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-    
-    // METHOD PROFIL
-    void profil_tampil() {
-        try {
-            dao_karyawan dao = new dao_karyawan();
-            List<m_karyawan> data = dao.readKaryawan();
-
-            for (m_karyawan d : data) {
-                if (d.getIdKaryawan().equals(log_id)) {
-                    profile_txt_ktp.setText(d.getNoKtp());
-                    System.out.println(d.getNoKtp());
-                    profile_txt_nama.setText(d.getNama());
-                    profile_txt_kontak.setText(d.getKontak());
-                    profile_txt_alamat.setText(d.getAlamat());
-                    profile_txt_level.setText(d.getLevel());
-                    System.out.println(d.getLevel());
-                }
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
-
-    void profil_edit(String nama, String kontak, String alamat) {
-        try {
-            dao_karyawan dao = new dao_karyawan();
-            m_karyawan data = new m_karyawan();
-            String date = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
-
-            data.setIdKaryawan(log_id);
-            data.setNama(nama);
-            data.setKontak(kontak);
-            data.setAlamat(alamat);
-            data.setEditedAt(date);
-
-            if (dao.editProfile(data)) {
-                JOptionPane.showMessageDialog(null, "Data berhasil tersimpan!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "Maaf, data gagal tersimpan!", "Gagal", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menyimpan data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    void ganti_password(String old, String now) {
-        try {
-            dao_karyawan dao = new dao_karyawan();
-            m_karyawan data = new m_karyawan();
-            String date = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
-
-            data.setIdKaryawan(log_id);
-            data.setPassword(old);
-            data.setEditedAt(date);
-
-            if (dao.ganti_password(data, now)) {
-                JOptionPane.showMessageDialog(null, "Data berhasil tersimpan!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "Maaf, data gagal tersimpan!", "Gagal", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menyimpan data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    // METHOD CUSTOMER
-    void customer_tampil() {
-        Object[] baris = {"ID", "NAMA", "NOMOR KTP", "ALAMAT", "KONTAK"};
-        DefaultTableModel dt = new DefaultTableModel(null, baris);
-        tb_customer.setModel(dt);
-
-        try {
-            dao_customer dao = new dao_customer();
-            List<m_customer> data = dao.readCustomer();
-
-            for (m_customer d : data) {
-                String[] isi = {d.getIdCustomer(), d.getNama(), d.getNoKtp(), d.getAlamat(), d.getKontak()};
-                dt.addRow(isi);
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
-
-    void tb_customer_klik() {
-        int row = tb_customer.getSelectedRow();
-        d_id_customer = tb_customer.getModel().getValueAt(row, 0).toString();
-    }
-
-    void tb_customer_cari(String query) {
-    }
-
-    void customer_hapus(String param) {
-        try {
-            dao_customer dao = new dao_customer();
-            m_customer data = new m_customer();
-            data.setIdCustomer(param);
-
-            if (dao.deleteKaryawan(data)) {
-                JOptionPane.showMessageDialog(null, "Data berhasil dihapus!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "Maaf, data gagal dihapus!", "Gagal", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menghapus data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    // METHOD KARYAWAN
-    void karyawan_tampil() {
-        Object[] baris = {"ID", "NAMA", "NOMOR KTP", "ALAMAT", "KONTAK", "LEVEL"};
-        DefaultTableModel dt = new DefaultTableModel(null, baris);
-        tb_karyawan.setModel(dt);
-
-        try {
-            dao_karyawan dao = new dao_karyawan();
-            List<m_karyawan> data = dao.readKaryawan();
-
-            for (m_karyawan d : data) {
-                String[] isi = {d.getIdKaryawan(), d.getNama(), d.getNoKtp(), d.getAlamat(), d.getKontak(), d.getLevel()};
-                dt.addRow(isi);
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
-
-    void tb_karyawan_klik() {
-        int row = tb_karyawan.getSelectedRow();
-        d_id_karyawan = tb_karyawan.getModel().getValueAt(row, 0).toString();
-    }
-
-    void tb_karyawan_cari(String query) {
-        try {
-            DefaultTableModel model = (DefaultTableModel) tb_karyawan.getModel();
-            TableRowSorter<DefaultTableModel> tr = new TableRowSorter<DefaultTableModel>(model);
-            tb_karyawan.setRowSorter(tr);
-            tr.setRowFilter(RowFilter.regexFilter(query));
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
-
-    void karyawan_hapus(String param) {
-        try {
-            dao_karyawan dao = new dao_karyawan();
-            m_karyawan data = new m_karyawan();
-            data.setIdKaryawan(param);
-
-            if (dao.deleteKaryawan(data)) {
-                JOptionPane.showMessageDialog(null, "Data berhasil dihapus!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "Maaf, data gagal dihapus!", "Gagal", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menghapus data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
-
-    // METHOD HARGA
-    void harga_tampil() {
-        Object[] baris = {"ID", "NAMA", "HARGA"};
-        DefaultTableModel dt = new DefaultTableModel(null, baris);
-        tb_harga.setModel(dt);
-
-        try {
-            dao_harga dao = new dao_harga();
-            List<m_harga> data = dao.readHarga();
-
-            for (m_harga d : data) {
-                String[] isi = {d.getIdHarga(), d.getNama(), Float.toString(d.getHarga())};
-                dt.addRow(isi);
-            }
-        } catch (Exception e) {
-            System.out.println(e);
-        }
-    }
-
-    void tb_harga_klik() {
-        int row = tb_harga.getSelectedRow();
-        d_id_harga = tb_harga.getModel().getValueAt(row, 0).toString();
-    }
-
-    void tb_harga_cari(String query) {
-    }
-
-    void harga_hapus(String param) {
-        try {
-            dao_harga dao = new dao_harga();
-            m_harga data = new m_harga();
-            data.setIdHarga(param);
-
-            if (dao.deleteHarga(data)) {
-                JOptionPane.showMessageDialog(null, "Data berhasil dihapus!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
-            } else {
-                JOptionPane.showMessageDialog(null, "Maaf, data gagal dihapus!", "Gagal", JOptionPane.ERROR_MESSAGE);
-            }
-        } catch (IOException e) {
-            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menghapus data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
-        }
+        Login login = new Login();
+        login.setVisible(true);
+        this.dispose();
     }
 
     /**
@@ -715,15 +727,12 @@ public class Admin_dashboard extends javax.swing.JFrame {
         jLabel10 = new javax.swing.JLabel();
         jScrollPane6 = new javax.swing.JScrollPane();
         tb_vcd = new javax.swing.JTable();
-        vcd_btn_tambah = new javax.swing.JPanel();
-        jLabel83 = new javax.swing.JLabel();
-        vcd_btn_edit = new javax.swing.JPanel();
-        jLabel84 = new javax.swing.JLabel();
-        vcd_btn_hapus = new javax.swing.JPanel();
-        jLabel85 = new javax.swing.JLabel();
         vcd_txt_cari = new javax.swing.JTextField();
-        vcd_btn_restock = new javax.swing.JPanel();
-        jLabel86 = new javax.swing.JLabel();
+        vcd_btn_tambah = new javax.swing.JButton();
+        vcd_btn_restock = new javax.swing.JButton();
+        vcd_btn_edit = new javax.swing.JButton();
+        vcd_btn_hapus = new javax.swing.JButton();
+        jButton3 = new javax.swing.JButton();
         customer = new javax.swing.JPanel();
         jLabel11 = new javax.swing.JLabel();
         jLabel12 = new javax.swing.JLabel();
@@ -2165,148 +2174,63 @@ public class Admin_dashboard extends javax.swing.JFrame {
 
             },
             new String [] {
-                "ID", "Judul", "Rilis", "Genre", "Bahasa", "Baik", "Buruk"
+
             }
         ));
+        tb_vcd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         tb_vcd.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 tb_vcdMouseClicked(evt);
             }
         });
         jScrollPane6.setViewportView(tb_vcd);
-        if (tb_vcd.getColumnModel().getColumnCount() > 0) {
-            tb_vcd.getColumnModel().getColumn(1).setMinWidth(100);
-            tb_vcd.getColumnModel().getColumn(1).setMaxWidth(100);
-            tb_vcd.getColumnModel().getColumn(2).setMinWidth(100);
-            tb_vcd.getColumnModel().getColumn(2).setMaxWidth(100);
-            tb_vcd.getColumnModel().getColumn(3).setMinWidth(100);
-            tb_vcd.getColumnModel().getColumn(3).setMaxWidth(100);
-        }
-
-        vcd_btn_tambah.setBackground(new java.awt.Color(204, 204, 204));
-        vcd_btn_tambah.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204), 2));
-        vcd_btn_tambah.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        vcd_btn_tambah.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                vcd_btn_tambahMouseClicked(evt);
-            }
-        });
-
-        jLabel83.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        jLabel83.setText("Tambah");
-        jLabel83.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel83MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout vcd_btn_tambahLayout = new javax.swing.GroupLayout(vcd_btn_tambah);
-        vcd_btn_tambah.setLayout(vcd_btn_tambahLayout);
-        vcd_btn_tambahLayout.setHorizontalGroup(
-            vcd_btn_tambahLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vcd_btn_tambahLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(jLabel83)
-                .addGap(15, 15, 15))
-        );
-        vcd_btn_tambahLayout.setVerticalGroup(
-            vcd_btn_tambahLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vcd_btn_tambahLayout.createSequentialGroup()
-                .addGap(3, 3, 3)
-                .addComponent(jLabel83)
-                .addGap(3, 3, 3))
-        );
-
-        vcd_btn_edit.setBackground(new java.awt.Color(204, 204, 204));
-        vcd_btn_edit.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204), 2));
-        vcd_btn_edit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        vcd_btn_edit.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                vcd_btn_editMouseClicked(evt);
-            }
-        });
-
-        jLabel84.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        jLabel84.setText("Edit");
-        jLabel84.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                jLabel84MouseClicked(evt);
-            }
-        });
-
-        javax.swing.GroupLayout vcd_btn_editLayout = new javax.swing.GroupLayout(vcd_btn_edit);
-        vcd_btn_edit.setLayout(vcd_btn_editLayout);
-        vcd_btn_editLayout.setHorizontalGroup(
-            vcd_btn_editLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vcd_btn_editLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(jLabel84)
-                .addGap(15, 15, 15))
-        );
-        vcd_btn_editLayout.setVerticalGroup(
-            vcd_btn_editLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vcd_btn_editLayout.createSequentialGroup()
-                .addGap(3, 3, 3)
-                .addComponent(jLabel84)
-                .addGap(3, 3, 3))
-        );
-
-        vcd_btn_hapus.setBackground(new java.awt.Color(204, 204, 204));
-        vcd_btn_hapus.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204), 2));
-        vcd_btn_hapus.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        vcd_btn_hapus.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                vcd_btn_hapusMouseClicked(evt);
-            }
-        });
-
-        jLabel85.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        jLabel85.setText("Hapus");
-
-        javax.swing.GroupLayout vcd_btn_hapusLayout = new javax.swing.GroupLayout(vcd_btn_hapus);
-        vcd_btn_hapus.setLayout(vcd_btn_hapusLayout);
-        vcd_btn_hapusLayout.setHorizontalGroup(
-            vcd_btn_hapusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vcd_btn_hapusLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(jLabel85)
-                .addGap(15, 15, 15))
-        );
-        vcd_btn_hapusLayout.setVerticalGroup(
-            vcd_btn_hapusLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vcd_btn_hapusLayout.createSequentialGroup()
-                .addGap(3, 3, 3)
-                .addComponent(jLabel85)
-                .addGap(3, 3, 3))
-        );
 
         vcd_txt_cari.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        vcd_txt_cari.setText("  Cari data");
         vcd_txt_cari.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
-        vcd_btn_restock.setBackground(new java.awt.Color(204, 204, 204));
-        vcd_btn_restock.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204), 2));
+        vcd_btn_tambah.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        vcd_btn_tambah.setText("Tambah");
+        vcd_btn_tambah.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        vcd_btn_tambah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                vcd_btn_tambahActionPerformed(evt);
+            }
+        });
+
+        vcd_btn_restock.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        vcd_btn_restock.setText("Restock");
         vcd_btn_restock.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        vcd_btn_restock.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                vcd_btn_restockActionPerformed(evt);
+            }
+        });
 
-        jLabel86.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        jLabel86.setText("Restock");
+        vcd_btn_edit.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        vcd_btn_edit.setText("Edit");
+        vcd_btn_edit.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        vcd_btn_edit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                vcd_btn_editActionPerformed(evt);
+            }
+        });
 
-        javax.swing.GroupLayout vcd_btn_restockLayout = new javax.swing.GroupLayout(vcd_btn_restock);
-        vcd_btn_restock.setLayout(vcd_btn_restockLayout);
-        vcd_btn_restockLayout.setHorizontalGroup(
-            vcd_btn_restockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vcd_btn_restockLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(jLabel86)
-                .addGap(15, 15, 15))
-        );
-        vcd_btn_restockLayout.setVerticalGroup(
-            vcd_btn_restockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(vcd_btn_restockLayout.createSequentialGroup()
-                .addGap(3, 3, 3)
-                .addComponent(jLabel86)
-                .addGap(3, 3, 3))
-        );
+        vcd_btn_hapus.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        vcd_btn_hapus.setText("Hapus");
+        vcd_btn_hapus.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        vcd_btn_hapus.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                vcd_btn_hapusActionPerformed(evt);
+            }
+        });
+
+        jButton3.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jButton3.setText("Refresh");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout vcdLayout = new javax.swing.GroupLayout(vcd);
         vcd.setLayout(vcdLayout);
@@ -2314,21 +2238,29 @@ public class Admin_dashboard extends javax.swing.JFrame {
             vcdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(vcdLayout.createSequentialGroup()
                 .addGap(45, 45, 45)
-                .addGroup(vcdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                .addGroup(vcdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(vcdLayout.createSequentialGroup()
-                        .addComponent(vcd_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(vcd_btn_tambah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(15, 15, 15)
-                        .addComponent(vcd_btn_restock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(15, 15, 15)
-                        .addComponent(vcd_btn_edit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(15, 15, 15)
-                        .addComponent(vcd_btn_hapus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel10, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)
-                    .addComponent(jScrollPane6, javax.swing.GroupLayout.Alignment.LEADING))
-                .addContainerGap(515, Short.MAX_VALUE))
+                        .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(vcdLayout.createSequentialGroup()
+                        .addComponent(jLabel9)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(vcdLayout.createSequentialGroup()
+                        .addGroup(vcdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addGroup(vcdLayout.createSequentialGroup()
+                                .addComponent(vcd_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jButton3)
+                                .addGap(10, 10, 10)
+                                .addComponent(vcd_btn_tambah)
+                                .addGap(10, 10, 10)
+                                .addComponent(vcd_btn_restock)
+                                .addGap(10, 10, 10)
+                                .addComponent(vcd_btn_edit)
+                                .addGap(10, 10, 10)
+                                .addComponent(vcd_btn_hapus))
+                            .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 900, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap(45, Short.MAX_VALUE))))
         );
         vcdLayout.setVerticalGroup(
             vcdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2338,16 +2270,19 @@ public class Admin_dashboard extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addComponent(jLabel10)
                 .addGap(20, 20, 20)
-                .addGroup(vcdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(vcd_btn_edit, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vcd_btn_restock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vcd_btn_hapus, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vcd_btn_tambah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(vcd_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(vcdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(vcd_btn_hapus)
+                    .addComponent(vcd_btn_edit)
+                    .addComponent(vcd_btn_restock)
+                    .addComponent(vcd_btn_tambah)
+                    .addComponent(vcd_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton3))
                 .addGap(15, 15, 15)
                 .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 460, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(73, Short.MAX_VALUE))
         );
+
+        vcdLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton3, vcd_btn_edit, vcd_btn_hapus, vcd_btn_restock, vcd_btn_tambah, vcd_txt_cari});
 
         right_panel.add(vcd, "card6");
 
@@ -2944,15 +2879,26 @@ public class Admin_dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_lp_customerMouseClicked
 
     private void lp_karyawanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lp_karyawanMouseClicked
-        karyawan();
+        if (log_level.equals("Administrator")) {
+            karyawan();
+        } else {
+            JOptionPane.showMessageDialog(null, "Anda tidak memiliki hak akses untuk menu ini!", "Keamanan", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_lp_karyawanMouseClicked
 
     private void lp_laporanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lp_laporanMouseClicked
-        laporan();
+        if (log_level.equals("Administrator")) {
+            laporan();
+        } else {
+            JOptionPane.showMessageDialog(null, "Anda tidak memiliki hak akses untuk menu ini!", "Keamanan", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_lp_laporanMouseClicked
 
     private void lp_keluarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lp_keluarMouseClicked
-        keluar();
+        int selection = JOptionPane.showConfirmDialog(null, "Keluar dari dashboard?", "Konfirmasi", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (selection == JOptionPane.OK_OPTION) {
+            keluar();
+        }
     }//GEN-LAST:event_lp_keluarMouseClicked
 
     private void d_pinjamMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_d_pinjamMouseClicked
@@ -2976,19 +2922,35 @@ public class Admin_dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_d_customerMouseClicked
 
     private void d_staffMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_d_staffMouseClicked
-        karyawan();
+        if (log_level.equals("Administrator")) {
+            karyawan();
+        } else {
+            JOptionPane.showMessageDialog(null, "Anda tidak memiliki hak akses untuk menu ini!", "Keamanan", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_d_staffMouseClicked
 
     private void d_hargaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_d_hargaMouseClicked
-        harga();
+        if (log_level.equals("Administrator")) {
+            harga();
+        } else {
+            JOptionPane.showMessageDialog(null, "Anda tidak memiliki hak akses untuk menu ini!", "Keamanan", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_d_hargaMouseClicked
 
     private void d_laporanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_d_laporanMouseClicked
-        laporan();
+        if (log_level.equals("Administrator")) {
+            laporan();
+        } else {
+            JOptionPane.showMessageDialog(null, "Anda tidak memiliki hak akses untuk menu ini!", "Keamanan", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_d_laporanMouseClicked
 
     private void lp_hargaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lp_hargaMouseClicked
-        harga();
+        if (log_level.equals("Administrator")) {
+            harga();
+        } else {
+            JOptionPane.showMessageDialog(null, "Anda tidak memiliki hak akses untuk menu ini!", "Keamanan", JOptionPane.WARNING_MESSAGE);
+        }
     }//GEN-LAST:event_lp_hargaMouseClicked
 
     private void lp_hargaMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lp_hargaMouseEntered
@@ -3004,7 +2966,10 @@ public class Admin_dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_lp_hargaMouseExited
 
     private void d_keluarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_d_keluarMouseClicked
-        keluar();
+        int selection = JOptionPane.showConfirmDialog(null, "Keluar dari dashboard?", "Konfirmasi", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (selection == JOptionPane.OK_OPTION) {
+            keluar();
+        }
     }//GEN-LAST:event_d_keluarMouseClicked
 
     private void d_keluarMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_d_keluarMouseEntered
@@ -3178,34 +3143,30 @@ public class Admin_dashboard extends javax.swing.JFrame {
             if (selection == JOptionPane.OK_OPTION) {
                 profil_edit(nama, kontak, alamat);
             }
-        }        // TODO add your handling code here:
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
-    private void vcd_btn_tambahMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vcd_btn_tambahMouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_vcd_btn_tambahMouseClicked
+    private void tb_vcdMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tb_vcdMouseClicked
+        tb_vcd_klik();
+    }//GEN-LAST:event_tb_vcdMouseClicked
 
-    private void jLabel83MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel83MouseClicked
-    Vcd_add tambah = new Vcd_add();
-    tambah.setVisible(true);        // TODO add your handling code here:
-    }//GEN-LAST:event_jLabel83MouseClicked
+    private void vcd_btn_tambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vcd_btn_tambahActionPerformed
+        Vcd_add tambah = new Vcd_add(log_id);
+        tambah.setVisible(true);
+    }//GEN-LAST:event_vcd_btn_tambahActionPerformed
 
-    private void jLabel84MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel84MouseClicked
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jLabel84MouseClicked
-
-    private void vcd_btn_editMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vcd_btn_editMouseClicked
-    if (d_id_vcd == null) {
+    private void vcd_btn_editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vcd_btn_editActionPerformed
+        if (d_id_vcd == null) {
             JOptionPane.showMessageDialog(null, "Mohon pilih dahulu data yang akan diedit pada tabel!", "Oops", JOptionPane.WARNING_MESSAGE);
         } else {
             Vcd_edit edit = new Vcd_edit(d_id_vcd);
             edit.setVisible(true);
             d_id_vcd = null;
-        }      // TODO add your handling code here:
-    }//GEN-LAST:event_vcd_btn_editMouseClicked
+        }
+    }//GEN-LAST:event_vcd_btn_editActionPerformed
 
-    private void vcd_btn_hapusMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vcd_btn_hapusMouseClicked
-    if (d_id_vcd == null) {
+    private void vcd_btn_hapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vcd_btn_hapusActionPerformed
+        if (d_id_vcd == null) {
             JOptionPane.showMessageDialog(null, "Mohon pilih dahulu data yang akan diedit pada tabel!", "Oops", JOptionPane.WARNING_MESSAGE);
         } else {
             int selection = JOptionPane.showConfirmDialog(null, "Hapus data?", "Konfirmasi", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
@@ -3213,12 +3174,22 @@ public class Admin_dashboard extends javax.swing.JFrame {
                 vcd_hapus(d_id_vcd);
                 d_id_vcd = null;
             }
-        }        // TODO add your handling code here:
-    }//GEN-LAST:event_vcd_btn_hapusMouseClicked
+        }
+    }//GEN-LAST:event_vcd_btn_hapusActionPerformed
 
-    private void tb_vcdMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tb_vcdMouseClicked
-    tb_vcd_klik();            // TODO add your handling code here:
-    }//GEN-LAST:event_tb_vcdMouseClicked
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        vcd_tampil();
+    }//GEN-LAST:event_jButton3ActionPerformed
+
+    private void vcd_btn_restockActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vcd_btn_restockActionPerformed
+        if (d_id_vcd == null) {
+            JOptionPane.showMessageDialog(null, "Mohon pilih dahulu data yang akan diedit pada tabel!", "Oops", JOptionPane.WARNING_MESSAGE);
+        } else {
+            Vcd_restock rest = new Vcd_restock(d_id_vcd, log_id);
+            rest.setVisible(true);
+            d_id_vcd = null;
+        }
+    }//GEN-LAST:event_vcd_btn_restockActionPerformed
 
     /**
      * @param args the command line arguments
@@ -3283,6 +3254,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JTextField harga_txt_cari;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JButton jButton3;
     private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
@@ -3351,10 +3323,6 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel65;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jLabel8;
-    private javax.swing.JLabel jLabel83;
-    private javax.swing.JLabel jLabel84;
-    private javax.swing.JLabel jLabel85;
-    private javax.swing.JLabel jLabel86;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLabel91;
     private javax.swing.JLabel jLabel92;
@@ -3416,10 +3384,10 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JTable tb_pinjam;
     private javax.swing.JTable tb_vcd;
     private javax.swing.JPanel vcd;
-    private javax.swing.JPanel vcd_btn_edit;
-    private javax.swing.JPanel vcd_btn_hapus;
-    private javax.swing.JPanel vcd_btn_restock;
-    private javax.swing.JPanel vcd_btn_tambah;
+    private javax.swing.JButton vcd_btn_edit;
+    private javax.swing.JButton vcd_btn_hapus;
+    private javax.swing.JButton vcd_btn_restock;
+    private javax.swing.JButton vcd_btn_tambah;
     private javax.swing.JTextField vcd_txt_cari;
     // End of variables declaration//GEN-END:variables
 }

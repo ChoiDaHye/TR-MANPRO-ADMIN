@@ -4,9 +4,9 @@ import java.util.Date;
 
 public class m_vcd {
     private String id_vcd, judul, genre, bahasa, poster, id_harga, rilis;
-    private int kondisi_baik, kondisi_buruk;
+    private int kondisi_baik, kondisi_buruk, terpinjam;
 
-    public m_vcd(String id_vcd, String judul, String genre, String bahasa, String poster, String id_harga, String rilis, int kondisi_baik, int kondisi_buruk) {
+    public m_vcd(String id_vcd, String judul, String genre, String bahasa, String poster, String id_harga, String rilis, int kondisi_baik, int kondisi_buruk, int terpinjam) {
         this.id_vcd = id_vcd;
         this.judul = judul;
         this.genre = genre;
@@ -16,10 +16,10 @@ public class m_vcd {
         this.rilis = rilis;
         this.kondisi_baik = kondisi_baik;
         this.kondisi_buruk = kondisi_buruk;
+        this.terpinjam = terpinjam;
     }
 
-    public m_vcd() {
-    }
+    public m_vcd() {}
     
     public String getId_vcd() {
         return id_vcd;
@@ -93,4 +93,12 @@ public class m_vcd {
     public void setKondisi_buruk(int kondisi_buruk) {
         this.kondisi_buruk = kondisi_buruk;
     }
+
+    public int getTerpinjam() {
+        return terpinjam;
+    }
+
+    public void setTerpinjam(int terpinjam) {
+        this.terpinjam = terpinjam;
+    }    
 }

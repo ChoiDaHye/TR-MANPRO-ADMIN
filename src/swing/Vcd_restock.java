@@ -1,22 +1,70 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package swing;
 
-/**
- *
- * @author dgeda
- */
+import dao.dao_vcd;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import javax.swing.JOptionPane;
+import models.m_vcd;
+import models.m_restock;
+
 public class Vcd_restock extends javax.swing.JFrame {
 
+    String param, kary;
+    
     /**
      * Creates new form Customer_add
      */
+    public Vcd_restock(String id, String kar) {
+        initComponents();
+        jPanel1.setFocusable(true);
+        
+        param = id;
+        kary = kar;
+        vcd_tampil();
+    }
+    
     public Vcd_restock() {
         initComponents();
         jPanel1.setFocusable(true);
+    }
+    
+    void vcd_tampil() {
+        try {
+            dao_vcd dao = new dao_vcd();
+            List<m_vcd> data = dao.readVcd();
+
+            for (m_vcd d : data) {
+                if (d.getId_vcd().equals(param)) {
+                    vcd_restock_now.setText(Integer.toString(d.getKondisi_baik()));
+                }
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+    }
+    
+    void restock(String baru){
+        try {
+            dao_vcd dao = new dao_vcd();
+            m_restock data = new m_restock();
+            String date = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+
+            data.setId_vcd(param);
+            data.setId_karyawan(kary);
+            data.setJumlah(Integer.parseInt(baru));
+            data.setTanggal(date);
+
+            if (dao.insertRestock(data)) {
+                JOptionPane.showMessageDialog(null, "Data berhasil tersimpan!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, data gagal tersimpan!", "Gagal", JOptionPane.ERROR_MESSAGE);
+            }
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menyimpan data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     /**
@@ -39,7 +87,7 @@ public class Vcd_restock extends javax.swing.JFrame {
         vcd_btn_simpan = new javax.swing.JPanel();
         jLabel73 = new javax.swing.JLabel();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Restock VCD");
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -48,7 +96,7 @@ public class Vcd_restock extends javax.swing.JFrame {
         jLabel1.setForeground(new java.awt.Color(51, 51, 51));
         jLabel1.setText("Restock VCD");
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(96, 96, 96));
         jLabel2.setText("Pastikan data VCD sudah benar");
 
@@ -66,14 +114,18 @@ public class Vcd_restock extends javax.swing.JFrame {
 
         vcd_restock_now.setEditable(false);
         vcd_restock_now.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        vcd_restock_now.setText("10");
         vcd_restock_now.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
         vcd_restock_add.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        vcd_restock_add.setText("5");
         vcd_restock_add.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
         vcd_btn_simpan.setBackground(new java.awt.Color(0, 120, 215));
+        vcd_btn_simpan.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        vcd_btn_simpan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                vcd_btn_simpanMouseClicked(evt);
+            }
+        });
 
         jLabel73.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
         jLabel73.setForeground(new java.awt.Color(255, 255, 255));
@@ -90,10 +142,7 @@ public class Vcd_restock extends javax.swing.JFrame {
         );
         vcd_btn_simpanLayout.setVerticalGroup(
             vcd_btn_simpanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vcd_btn_simpanLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel73)
-                .addContainerGap())
+            .addComponent(jLabel73, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
         );
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
@@ -123,7 +172,7 @@ public class Vcd_restock extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(40, 40, 40)
+                .addGap(25, 25, 25)
                 .addComponent(jLabel1)
                 .addGap(10, 10, 10)
                 .addComponent(jLabel2)
@@ -132,12 +181,12 @@ public class Vcd_restock extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jLabel4)
-                    .addComponent(vcd_restock_now, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(vcd_restock_now, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(10, 10, 10)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jLabel5)
                     .addComponent(vcd_restock_add, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(20, 20, 20)
+                .addGap(15, 15, 15)
                 .addComponent(vcd_btn_simpan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(40, 40, 40))
         );
@@ -156,7 +205,17 @@ public class Vcd_restock extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    private void vcd_btn_simpanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vcd_btn_simpanMouseClicked
+        String baru = vcd_restock_add.getText();
+        if(baru.isEmpty()){
+            vcd_restock_add.requestFocus();
+        } else{
+            restock(baru);
+        }
+    }//GEN-LAST:event_vcd_btn_simpanMouseClicked
 
     /**
      * @param args the command line arguments

@@ -1,11 +1,7 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package swing;
 
 import dao.dao_vcd;
+import java.awt.Dimension;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,10 +9,6 @@ import java.util.List;
 import javax.swing.JOptionPane;
 import models.m_vcd;
 
-/**
- *
- * @author dgeda
- */
 public class Vcd_edit extends javax.swing.JFrame {
 
     String param, iden;
@@ -49,8 +41,8 @@ public class Vcd_edit extends javax.swing.JFrame {
                     vcd_edit_bahasa.setText(d.getBahasa());
                     vcd_edit_rilis.setText(d.getRilis());
                     vcd_edit_poster.setText(d.getPoster());
-//                    vcd_edit_harga.setSelectedItem(0);
-//                    iden = d.getNama().toLowerCase();
+                    vcd_edit_genre.setText(d.getGenre());
+                    vcd_edit_poster.setPreferredSize(new Dimension(250, 35));
                 }
             }
         } catch (Exception e) {
@@ -70,6 +62,7 @@ public class Vcd_edit extends javax.swing.JFrame {
             data.setPoster(poster);
             data.setId_harga(id_harga);
             data.setRilis(rilis);
+            data.setId_vcd(param);
 
             if (dao.editVcd(data)) {
                 JOptionPane.showMessageDialog(null, "Data berhasil tersimpan!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
@@ -77,7 +70,6 @@ public class Vcd_edit extends javax.swing.JFrame {
                 vcd_edit_judul.setText("");
                 vcd_edit_bahasa.setText("");
                 vcd_edit_genre.setText("");
-                vcd_edit_harga.setSelectedItem(0);
                 vcd_edit_poster.setText("");
                 vcd_edit_rilis.setText("");
 
@@ -115,10 +107,8 @@ public class Vcd_edit extends javax.swing.JFrame {
         jLabel73 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
         vcd_edit_poster = new javax.swing.JTextField();
-        jLabel10 = new javax.swing.JLabel();
-        vcd_edit_harga = new javax.swing.JComboBox<>();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Edit data VCD");
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
@@ -127,7 +117,7 @@ public class Vcd_edit extends javax.swing.JFrame {
         jLabel1.setForeground(new java.awt.Color(51, 51, 51));
         jLabel1.setText("Edit data VCD");
 
-        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(96, 96, 96));
         jLabel2.setText("Pastikan data VCD sudah benar");
 
@@ -152,22 +142,19 @@ public class Vcd_edit extends javax.swing.JFrame {
         jLabel7.setText("Bahasa");
 
         vcd_edit_judul.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        vcd_edit_judul.setText("Spider-Man: Far from Home");
         vcd_edit_judul.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
         vcd_edit_rilis.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        vcd_edit_rilis.setText("02/07/2019");
         vcd_edit_rilis.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
         vcd_edit_genre.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        vcd_edit_genre.setText("Action, Adventure, Sci-Fi");
         vcd_edit_genre.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
         vcd_edit_bahasa.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        vcd_edit_bahasa.setText("English");
         vcd_edit_bahasa.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
         vcd_btn_simpan.setBackground(new java.awt.Color(0, 120, 215));
+        vcd_btn_simpan.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         vcd_btn_simpan.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 vcd_btn_simpanMouseClicked(evt);
@@ -189,10 +176,7 @@ public class Vcd_edit extends javax.swing.JFrame {
         );
         vcd_btn_simpanLayout.setVerticalGroup(
             vcd_btn_simpanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, vcd_btn_simpanLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel73)
-                .addContainerGap())
+            .addComponent(jLabel73, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
         );
 
         jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
@@ -206,12 +190,6 @@ public class Vcd_edit extends javax.swing.JFrame {
                 vcd_edit_posterActionPerformed(evt);
             }
         });
-
-        jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel10.setForeground(new java.awt.Color(93, 93, 93));
-        jLabel10.setText("Harga");
-
-        vcd_edit_harga.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "15000.00" }));
 
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
@@ -228,8 +206,7 @@ public class Vcd_edit extends javax.swing.JFrame {
                             .addComponent(jLabel5)
                             .addComponent(jLabel6)
                             .addComponent(jLabel7)
-                            .addComponent(jLabel8)
-                            .addComponent(jLabel10))
+                            .addComponent(jLabel8))
                         .addGap(40, 40, 40)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(vcd_edit_bahasa)
@@ -237,8 +214,7 @@ public class Vcd_edit extends javax.swing.JFrame {
                             .addComponent(vcd_edit_rilis)
                             .addComponent(vcd_edit_judul, javax.swing.GroupLayout.DEFAULT_SIZE, 250, Short.MAX_VALUE)
                             .addComponent(vcd_btn_simpan, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(vcd_edit_poster)
-                            .addComponent(vcd_edit_harga, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(vcd_edit_poster)))
                     .addComponent(jLabel3))
                 .addGap(40, 40, 40))
         );
@@ -248,7 +224,7 @@ public class Vcd_edit extends javax.swing.JFrame {
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(40, 40, 40)
+                .addGap(25, 25, 25)
                 .addComponent(jLabel1)
                 .addGap(10, 10, 10)
                 .addComponent(jLabel2)
@@ -257,7 +233,7 @@ public class Vcd_edit extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jLabel4)
-                    .addComponent(vcd_edit_judul, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(vcd_edit_judul, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(10, 10, 10)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jLabel5)
@@ -271,19 +247,15 @@ public class Vcd_edit extends javax.swing.JFrame {
                     .addComponent(jLabel7)
                     .addComponent(vcd_edit_bahasa, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(10, 10, 10)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jLabel10)
-                    .addComponent(vcd_edit_harga, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(10, 10, 10)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel8)
                     .addComponent(vcd_edit_poster, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(20, 20, 20)
+                .addGap(15, 15, 15)
                 .addComponent(vcd_btn_simpan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(40, 40, 40))
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {vcd_edit_bahasa, vcd_edit_genre, vcd_edit_harga, vcd_edit_judul, vcd_edit_poster, vcd_edit_rilis});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {vcd_edit_bahasa, vcd_edit_genre, vcd_edit_judul, vcd_edit_poster, vcd_edit_rilis});
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -297,6 +269,7 @@ public class Vcd_edit extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void vcd_edit_posterActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_vcd_edit_posterActionPerformed
@@ -305,7 +278,7 @@ public class Vcd_edit extends javax.swing.JFrame {
 
     private void vcd_btn_simpanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vcd_btn_simpanMouseClicked
         String judul = vcd_edit_judul.getText(), bahasa = vcd_edit_bahasa.getText(), rilis = vcd_edit_rilis.getText(), poster = vcd_edit_poster.getText(), genre = vcd_edit_genre.getText();
-        String id_harga = "0";
+        String id_harga = "H0001";
         if (judul.isEmpty() || bahasa.isEmpty() || rilis.isEmpty() || poster.isEmpty() || genre.isEmpty()) {
             JOptionPane.showMessageDialog(null, "Mohon lengkapi data!", "Peringatan", JOptionPane.ERROR_MESSAGE);
 
@@ -325,7 +298,7 @@ public class Vcd_edit extends javax.swing.JFrame {
             if (selection == JOptionPane.OK_OPTION) {
                 vcd_edit(judul, genre, bahasa, poster, id_harga, rilis);
             }
-        }        // TODO add your handling code here:
+        }
     }//GEN-LAST:event_vcd_btn_simpanMouseClicked
 
     /**
@@ -374,7 +347,6 @@ public class Vcd_edit extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -387,7 +359,6 @@ public class Vcd_edit extends javax.swing.JFrame {
     private javax.swing.JPanel vcd_btn_simpan;
     private javax.swing.JTextField vcd_edit_bahasa;
     private javax.swing.JTextField vcd_edit_genre;
-    private javax.swing.JComboBox<String> vcd_edit_harga;
     private javax.swing.JTextField vcd_edit_judul;
     private javax.swing.JTextField vcd_edit_poster;
     private javax.swing.JTextField vcd_edit_rilis;
