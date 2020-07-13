@@ -1,24 +1,135 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package swing;
 
+import dao.dao_kembali;
 import java.awt.GraphicsEnvironment;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.util.ArrayList;
+import java.util.List;
+import javax.swing.JOptionPane;
+import javax.swing.JTextField;
+import javax.swing.table.DefaultTableModel;
+import models.m_keranjang_2;
+import models.m_pinjam_det;
 
-/**
- *
- * @author dgeda
- */
 public class Trans_kembali extends javax.swing.JFrame {
 
     /**
      * Creates new form Trans_kembali
      */
+    private String log_id, booking_id, id_vcd;
+    private int cek;
+    private List<m_keranjang_2> keranjang = new ArrayList<m_keranjang_2>();
+
+    public Trans_kembali(String kary, String id) {
+        initComponents();
+
+        log_id = kary;
+        booking_id = id;
+        kembali_txt_booking.setText(booking_id);
+        tb_detail_pesanan();
+        jLabel6.setText("<html>Jangan lupa minta kode booking dari pelanggan dan periksa kondisi VCD yang dipinjam ya<html>");
+    }
+
     public Trans_kembali() {
         initComponents();
         jLabel6.setText("<html>Jangan lupa minta kode booking dari pelanggan dan periksa kondisi VCD yang dipinjam ya<html>");
+    }
+
+    void tb_detail_pesanan() {
+        String id_pinjam = booking_id;
+
+        Object[] baris = {"ID VCD", "JUDUL", "HARUS DIKEMBALIKAN"};
+        DefaultTableModel dt = new DefaultTableModel(null, baris);
+        tb_kembali.setModel(dt);
+        dt.setRowCount(0);
+
+        try {
+            dao_kembali dao = new dao_kembali();
+            List<m_pinjam_det> data = dao.readDetail(id_pinjam);
+
+            for (m_pinjam_det d : data) {
+                int balik = d.getJumlah() - d.getKembali();
+                if(balik > 0){
+                    String[] isi = {d.getId_vcd(), dao.getJudul(d.getId_vcd()), Integer.toString(balik)};
+                    dt.addRow(isi);
+                }                
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    void tb_klik() {
+        int row = tb_kembali.getSelectedRow();
+        int baik = Integer.parseInt(tb_kembali.getModel().getValueAt(row, 2).toString());
+        int buruk = 0;
+        
+        cek = baik;
+        kembali_txt_baik.setText(Integer.toString(baik));        
+        kembali_txt_rusak.setText(Integer.toString(buruk));        
+    }
+    
+//    void tb_vcd_to_basket(String id, int bk, int rk) {
+//        try {
+//            dao_kembali dao = new dao_kembali();
+//
+//            float denda = dao.getDrusak();
+//            float sub = rk * denda;
+//
+//            if (keranjang.isEmpty()) {
+//                keranjang.add(new m_keranjang_2(id, bk, rk, sub));
+//            } else {
+//                int i = 0;
+//                boolean cek = false;
+//
+//                for (m_keranjang_2 k : keranjang) {
+//                    if (k.getId().equals(id)) {
+//                        cek = true;
+//                        int newjm = k.getJumlah() + jm;
+//                        float newsub = k.getSubtotal() + sub;
+//                        keranjang.set(i, new m_keranjang(id, jd, newjm, newsub));
+//                    }
+//                    i++;
+//                }
+//
+//                if (!cek) {
+//                    keranjang.add(new m_keranjang(id, jd, jm, sub));
+//                }
+//            }
+//
+//            tampil_keranjang();
+//            hit_total();
+//
+//            log_jd = "";
+//            log_vcd = "";
+//            log_sup = 0;
+//            pinjam_txt_qty.setText("");
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(null, "Gagal mendapatkan data\n" + e, "Gagal", JOptionPane.ERROR_MESSAGE);
+//        }
+//    }
+    
+    void acceptNUMBER(JTextField tf) {
+        tf.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent ke) {
+                char ch = ke.getKeyChar();
+                if (Character.isDigit(ch) || ke.getExtendedKeyCode() == KeyEvent.VK_SPACE || ke.getExtendedKeyCode() == KeyEvent.VK_BACK_SPACE || ke.getExtendedKeyCode() == KeyEvent.VK_DELETE) {
+                    tf.setEditable(true);
+                } else {
+                    tf.setEditable(false);
+                }
+            }
+        });
+    }
+
+    static boolean numberOrNot(String input) {
+        try {
+            Integer.parseInt(input);
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -33,147 +144,218 @@ public class Trans_kembali extends javax.swing.JFrame {
         pengembalian = new javax.swing.JPanel();
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
-        jLabel105 = new javax.swing.JLabel();
+        jPanel1 = new javax.swing.JPanel();
+        kembali_txt_booking = new javax.swing.JTextField();
+        kembali_txt_baik = new javax.swing.JTextField();
+        kembali_txt_rusak = new javax.swing.JTextField();
+        kembali_txt_harga = new javax.swing.JTextField();
+        kembali_txt_bayar = new javax.swing.JTextField();
+        jButton2 = new javax.swing.JButton();
+        kembali_btn_proses1 = new javax.swing.JPanel();
+        jLabel119 = new javax.swing.JLabel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
+        jLabel8 = new javax.swing.JLabel();
+        jLabel9 = new javax.swing.JLabel();
+        jLabel10 = new javax.swing.JLabel();
+        jPanel2 = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
         tb_kembali = new javax.swing.JTable();
-        kembali_txt_booking = new javax.swing.JTextField();
-        kembali_txt_total = new javax.swing.JTextField();
-        kembali_txt_bayar = new javax.swing.JTextField();
-        jLabel76 = new javax.swing.JLabel();
-        jLabel87 = new javax.swing.JLabel();
-        jLabel112 = new javax.swing.JLabel();
-        jLabel113 = new javax.swing.JLabel();
-        jLabel114 = new javax.swing.JLabel();
-        jLabel116 = new javax.swing.JLabel();
-        kembali_btn_simpan = new javax.swing.JPanel();
-        jLabel117 = new javax.swing.JLabel();
-        kembali_btn_proses = new javax.swing.JPanel();
-        jLabel118 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
-        jTextField1 = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
-        jTextField3 = new javax.swing.JTextField();
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Transaksi pengembalian");
+        setPreferredSize(new java.awt.Dimension(999, 686));
+        setResizable(false);
 
         pengembalian.setBackground(new java.awt.Color(255, 255, 255));
 
         jLabel5.setFont(new java.awt.Font("Segoe UI", 0, 24)); // NOI18N
         jLabel5.setText("Transaksi pengembalian");
 
-        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel6.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         jLabel6.setForeground(new java.awt.Color(96, 96, 96));
         jLabel6.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
 
-        jLabel105.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
-        jLabel105.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel105.setText("Data transaksi");
-
-        tb_kembali.setModel(new javax.swing.table.DefaultTableModel(
-            new Object [][] {
-                {"V0001", "Spider-Man: Far from Home", "3"},
-                {"V0002", "Home Alone", "1"}
-            },
-            new String [] {
-                "ID VCD", "VCD", "JUMLAH"
-            }
-        ));
-        jScrollPane8.setViewportView(tb_kembali);
+        jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
         kembali_txt_booking.setEditable(false);
-        kembali_txt_booking.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
-        kembali_txt_booking.setText("B0001");
+        kembali_txt_booking.setBackground(new java.awt.Color(244, 244, 244));
+        kembali_txt_booking.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         kembali_txt_booking.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
-        kembali_txt_booking.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                kembali_txt_bookingActionPerformed(evt);
+
+        kembali_txt_baik.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        kembali_txt_baik.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
+        kembali_txt_baik.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                kembali_txt_baikKeyPressed(evt);
             }
         });
 
-        kembali_txt_total.setEditable(false);
-        kembali_txt_total.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
-        kembali_txt_total.setText("0.00");
-        kembali_txt_total.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(213, 213, 213), 2));
+        kembali_txt_rusak.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        kembali_txt_rusak.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
+        kembali_txt_rusak.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                kembali_txt_rusakKeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                kembali_txt_rusakKeyReleased(evt);
+            }
+        });
 
-        kembali_txt_bayar.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
+        kembali_txt_harga.setEditable(false);
+        kembali_txt_harga.setBackground(new java.awt.Color(244, 244, 244));
+        kembali_txt_harga.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        kembali_txt_harga.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
+
+        kembali_txt_bayar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         kembali_txt_bayar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
-        jLabel76.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel76.setForeground(new java.awt.Color(93, 93, 93));
-        jLabel76.setText("Nomor transaksi");
+        jButton2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jButton2.setText("Proses");
+        jButton2.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
-        jLabel87.setFont(new java.awt.Font("Segoe UI Semibold", 0, 18)); // NOI18N
-        jLabel87.setForeground(new java.awt.Color(51, 51, 51));
-        jLabel87.setText("Pembayaran");
+        kembali_btn_proses1.setBackground(new java.awt.Color(0, 120, 215));
+        kembali_btn_proses1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
 
-        jLabel112.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel112.setForeground(new java.awt.Color(93, 93, 93));
-        jLabel112.setText("Total denda");
+        jLabel119.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
+        jLabel119.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel119.setText("Simpan transaksi");
 
-        jLabel113.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel113.setForeground(new java.awt.Color(93, 93, 93));
-        jLabel113.setText("Harga bayar");
-
-        jLabel114.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel114.setForeground(new java.awt.Color(93, 93, 93));
-        jLabel114.setText("Kondisi rusak");
-
-        jLabel116.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel116.setForeground(new java.awt.Color(96, 96, 96));
-        jLabel116.setText("Klik data pada tabel untuk memperbaharui kondisi");
-
-        kembali_btn_simpan.setBackground(new java.awt.Color(204, 204, 204));
-        kembali_btn_simpan.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204), 2));
-        kembali_btn_simpan.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        jLabel117.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        jLabel117.setText("Simpan");
-
-        javax.swing.GroupLayout kembali_btn_simpanLayout = new javax.swing.GroupLayout(kembali_btn_simpan);
-        kembali_btn_simpan.setLayout(kembali_btn_simpanLayout);
-        kembali_btn_simpanLayout.setHorizontalGroup(
-            kembali_btn_simpanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kembali_btn_simpanLayout.createSequentialGroup()
-                .addContainerGap(91, Short.MAX_VALUE)
-                .addComponent(jLabel117)
-                .addContainerGap(92, Short.MAX_VALUE))
+        javax.swing.GroupLayout kembali_btn_proses1Layout = new javax.swing.GroupLayout(kembali_btn_proses1);
+        kembali_btn_proses1.setLayout(kembali_btn_proses1Layout);
+        kembali_btn_proses1Layout.setHorizontalGroup(
+            kembali_btn_proses1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(kembali_btn_proses1Layout.createSequentialGroup()
+                .addContainerGap(64, Short.MAX_VALUE)
+                .addComponent(jLabel119)
+                .addContainerGap(65, Short.MAX_VALUE))
         );
-        kembali_btn_simpanLayout.setVerticalGroup(
-            kembali_btn_simpanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(kembali_btn_simpanLayout.createSequentialGroup()
-                .addGap(3, 3, 3)
-                .addComponent(jLabel117)
-                .addGap(3, 3, 3))
+        kembali_btn_proses1Layout.setVerticalGroup(
+            kembali_btn_proses1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLabel119, javax.swing.GroupLayout.DEFAULT_SIZE, 42, Short.MAX_VALUE)
         );
 
-        kembali_btn_proses.setBackground(new java.awt.Color(0, 120, 215));
+        jLabel1.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(93, 93, 93));
+        jLabel1.setText("No. Transaksi");
 
-        jLabel118.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
-        jLabel118.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel118.setText("Simpan transaksi");
+        jLabel2.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(93, 93, 93));
+        jLabel2.setText("Kondisi baik");
 
-        javax.swing.GroupLayout kembali_btn_prosesLayout = new javax.swing.GroupLayout(kembali_btn_proses);
-        kembali_btn_proses.setLayout(kembali_btn_prosesLayout);
-        kembali_btn_prosesLayout.setHorizontalGroup(
-            kembali_btn_prosesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(kembali_btn_prosesLayout.createSequentialGroup()
-                .addContainerGap(67, Short.MAX_VALUE)
-                .addComponent(jLabel118)
-                .addContainerGap(67, Short.MAX_VALUE))
+        jLabel4.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel4.setForeground(new java.awt.Color(93, 93, 93));
+        jLabel4.setText("Kondisi buruk");
+
+        jLabel7.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(93, 93, 93));
+        jLabel7.setText("Total denda");
+
+        jLabel8.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel8.setForeground(new java.awt.Color(93, 93, 93));
+        jLabel8.setText("Harga bayar");
+
+        jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        jLabel9.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel9.setText("Data transaksi");
+
+        jLabel10.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        jLabel10.setForeground(new java.awt.Color(51, 51, 51));
+        jLabel10.setText("Keranjang dan pembayaran");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel9)
+                    .addComponent(jLabel10)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel1)
+                            .addComponent(jLabel2)
+                            .addComponent(jLabel4)
+                            .addComponent(jLabel8)
+                            .addComponent(jLabel7))
+                        .addGap(40, 40, 40)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                            .addComponent(kembali_txt_bayar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(kembali_txt_harga, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jButton2)
+                            .addComponent(kembali_txt_rusak, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(kembali_txt_baik, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(kembali_txt_booking, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(kembali_btn_proses1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(0, 0, Short.MAX_VALUE))
         );
-        kembali_btn_prosesLayout.setVerticalGroup(
-            kembali_btn_prosesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, kembali_btn_prosesLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jLabel118)
-                .addContainerGap())
+
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton2, kembali_btn_proses1, kembali_txt_baik, kembali_txt_bayar, kembali_txt_booking, kembali_txt_harga, kembali_txt_rusak});
+
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jLabel9)
+                .addGap(15, 15, 15)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jLabel1)
+                    .addComponent(kembali_txt_booking, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(10, 10, 10)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jLabel2)
+                    .addComponent(kembali_txt_baik, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(10, 10, 10)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jLabel4)
+                    .addComponent(kembali_txt_rusak, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15)
+                .addComponent(jButton2)
+                .addGap(80, 80, 80)
+                .addComponent(jLabel10)
+                .addGap(15, 15, 15)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jLabel7)
+                    .addComponent(kembali_txt_harga, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(10, 10, 10)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jLabel8)
+                    .addComponent(kembali_txt_bayar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(15, 15, 15)
+                .addComponent(kembali_btn_proses1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0))
         );
+
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton2, kembali_txt_baik, kembali_txt_bayar, kembali_txt_booking, kembali_txt_harga, kembali_txt_rusak});
+
+        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+
+        tb_kembali.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+
+            }
+        ));
+        tb_kembali.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tb_kembaliMouseClicked(evt);
+            }
+        });
+        jScrollPane8.setViewportView(tb_kembali);
 
         jTable1.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"V0001", "2", "0", "0.00"}
+
             },
             new String [] {
                 "ID VCD", "BAIK", "RUSAK", "DENDA"
@@ -181,17 +363,22 @@ public class Trans_kembali extends javax.swing.JFrame {
         ));
         jScrollPane1.setViewportView(jTable1);
 
-        jTextField1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(93, 93, 93), 2));
-        jTextField1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jTextField1ActionPerformed(evt);
-            }
-        });
-
-        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        jLabel3.setText("Kuantitas");
-
-        jTextField3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(93, 93, 93), 2));
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 500, Short.MAX_VALUE)
+            .addComponent(jScrollPane1)
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addGap(35, 35, 35)
+                .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(112, 112, 112)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(0, 0, 0))
+        );
 
         javax.swing.GroupLayout pengembalianLayout = new javax.swing.GroupLayout(pengembalian);
         pengembalian.setLayout(pengembalianLayout);
@@ -202,100 +389,34 @@ public class Trans_kembali extends javax.swing.JFrame {
                 .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(pengembalianLayout.createSequentialGroup()
                         .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(pengembalianLayout.createSequentialGroup()
-                                .addComponent(jLabel87)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addGroup(pengembalianLayout.createSequentialGroup()
-                                .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jLabel76)
-                                    .addComponent(jLabel114)
-                                    .addComponent(jLabel3))
-                                .addGap(27, 27, 27)
-                                .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jTextField3, javax.swing.GroupLayout.Alignment.TRAILING)
-                                    .addComponent(kembali_txt_booking, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
-                                    .addComponent(jTextField1, javax.swing.GroupLayout.Alignment.TRAILING)))
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pengembalianLayout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pengembalianLayout.createSequentialGroup()
-                                        .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel112)
-                                            .addComponent(jLabel113))
-                                        .addGap(53, 53, 53)
-                                        .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(kembali_txt_bayar)
-                                            .addComponent(kembali_txt_total)
-                                            .addComponent(kembali_btn_proses, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                    .addComponent(kembali_btn_simpan, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                        .addGap(50, 50, 50)
-                        .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(jLabel116)
-                            .addComponent(jScrollPane8, javax.swing.GroupLayout.DEFAULT_SIZE, 380, Short.MAX_VALUE)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE)))
-                    .addGroup(pengembalianLayout.createSequentialGroup()
-                        .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel5)
-                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel105))
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addGap(45, 45, 45))
+                            .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(pengembalianLayout.createSequentialGroup()
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(50, 50, 50)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(45, 45, 45))))
         );
         pengembalianLayout.setVerticalGroup(
             pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pengembalianLayout.createSequentialGroup()
-                .addGap(40, 40, 40)
+                .addGap(25, 25, 25)
                 .addComponent(jLabel5)
                 .addGap(15, 15, 15)
                 .addComponent(jLabel6)
                 .addGap(20, 20, 20)
-                .addComponent(jLabel105)
-                .addGap(15, 15, 15)
                 .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pengembalianLayout.createSequentialGroup()
-                        .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 131, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(15, 15, 15)
-                        .addComponent(jLabel116)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 60, Short.MAX_VALUE)
-                        .addComponent(jLabel87))
-                    .addGroup(pengembalianLayout.createSequentialGroup()
-                        .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(kembali_txt_booking, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel76))
-                        .addGap(25, 25, 25)
-                        .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(jTextField3, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(18, 18, 18)
-                        .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel114)
-                            .addComponent(jTextField1, javax.swing.GroupLayout.PREFERRED_SIZE, 29, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(25, 25, 25)
-                        .addComponent(kembali_btn_simpan, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
-                .addGap(18, 18, 18)
-                .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pengembalianLayout.createSequentialGroup()
-                        .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(kembali_txt_total, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel112))
-                        .addGap(10, 10, 10)
-                        .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(kembali_txt_bayar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel113))
-                        .addGap(15, 15, 15)
-                        .addComponent(kembali_btn_proses, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 101, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(50, 50, 50))
+                    .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(45, 45, 45))
         );
-
-        pengembalianLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {kembali_txt_bayar, kembali_txt_booking, kembali_txt_total});
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 915, Short.MAX_VALUE)
+            .addGap(0, 1374, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addGap(0, 0, 0)
@@ -304,7 +425,7 @@ public class Trans_kembali extends javax.swing.JFrame {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 1004, Short.MAX_VALUE)
+            .addGap(0, 1354, Short.MAX_VALUE)
             .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                 .addGroup(layout.createSequentialGroup()
                     .addGap(0, 0, 0)
@@ -313,15 +434,44 @@ public class Trans_kembali extends javax.swing.JFrame {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jTextField1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jTextField1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jTextField1ActionPerformed
+    private void tb_kembaliMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tb_kembaliMouseClicked
+        tb_klik();
+    }//GEN-LAST:event_tb_kembaliMouseClicked
 
-    private void kembali_txt_bookingActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kembali_txt_bookingActionPerformed
+    private void kembali_txt_baikKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_kembali_txt_baikKeyPressed
+        acceptNUMBER(kembali_txt_baik);
+    }//GEN-LAST:event_kembali_txt_baikKeyPressed
+
+    private void kembali_txt_rusakKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_kembali_txt_rusakKeyReleased
         // TODO add your handling code here:
-    }//GEN-LAST:event_kembali_txt_bookingActionPerformed
+    }//GEN-LAST:event_kembali_txt_rusakKeyReleased
+
+    private void kembali_txt_rusakKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_kembali_txt_rusakKeyPressed
+        acceptNUMBER(kembali_txt_rusak);
+    }//GEN-LAST:event_kembali_txt_rusakKeyPressed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        if(!numberOrNot(kembali_txt_baik.getText())){
+            kembali_txt_baik.requestFocus();
+        } else if(!numberOrNot(kembali_txt_rusak.getText())){
+            kembali_txt_rusak.requestFocus();
+        } else{
+            int baik = Integer.parseInt(kembali_txt_baik.getText());
+            int buruk= Integer.parseInt(kembali_txt_rusak.getText());
+            
+            if((baik + buruk) > cek){
+                JOptionPane.showMessageDialog(null, "Jumlah baik dan buruk tidak diterima!", "Kesalahan", JOptionPane.ERROR_MESSAGE);
+                kembali_txt_baik.setText(Integer.toString(cek));
+                kembali_txt_rusak.setText("0");
+                kembali_txt_baik.requestFocus();
+            } else{
+                
+            }
+        }
+    }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -359,28 +509,28 @@ public class Trans_kembali extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel jLabel105;
-    private javax.swing.JLabel jLabel112;
-    private javax.swing.JLabel jLabel113;
-    private javax.swing.JLabel jLabel114;
-    private javax.swing.JLabel jLabel116;
-    private javax.swing.JLabel jLabel117;
-    private javax.swing.JLabel jLabel118;
-    private javax.swing.JLabel jLabel3;
+    private javax.swing.JButton jButton2;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel119;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
-    private javax.swing.JLabel jLabel76;
-    private javax.swing.JLabel jLabel87;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel8;
+    private javax.swing.JLabel jLabel9;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane8;
     private javax.swing.JTable jTable1;
-    private javax.swing.JTextField jTextField1;
-    private javax.swing.JTextField jTextField3;
-    private javax.swing.JPanel kembali_btn_proses;
-    private javax.swing.JPanel kembali_btn_simpan;
+    private javax.swing.JPanel kembali_btn_proses1;
+    private javax.swing.JTextField kembali_txt_baik;
     private javax.swing.JTextField kembali_txt_bayar;
     private javax.swing.JTextField kembali_txt_booking;
-    private javax.swing.JTextField kembali_txt_total;
+    private javax.swing.JTextField kembali_txt_harga;
+    private javax.swing.JTextField kembali_txt_rusak;
     private javax.swing.JPanel pengembalian;
     private javax.swing.JTable tb_kembali;
     // End of variables declaration//GEN-END:variables

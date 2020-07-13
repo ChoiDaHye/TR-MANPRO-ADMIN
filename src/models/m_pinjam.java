@@ -1,11 +1,21 @@
 package models;
 
-import java.util.Date;
-
 public class m_pinjam {
-    private String id_pinjam, status, id_customer, id_karyawan;
-    private Date tgl_pinjam, jatuh_tempo;
+    private String id_pinjam, status, id_customer, id_karyawan, tgl_pinjam, jatuh_tempo;
     private float harga_total;
+
+    public m_pinjam() {
+    }
+
+    public m_pinjam(String id_pinjam, String tgl_pinjam, String jatuh_tempo, float harga_total, String status, String id_customer, String id_karyawan) {
+        this.id_pinjam = id_pinjam;
+        this.status = status;
+        this.id_customer = id_customer;
+        this.id_karyawan = id_karyawan;
+        this.tgl_pinjam = tgl_pinjam;
+        this.jatuh_tempo = jatuh_tempo;
+        this.harga_total = harga_total;
+    }
 
     public String getId_pinjam() {
         return id_pinjam;
@@ -39,19 +49,19 @@ public class m_pinjam {
         this.id_karyawan = id_karyawan;
     }
 
-    public Date getTgl_pinjam() {
+    public String getTgl_pinjam() {
         return tgl_pinjam;
     }
 
-    public void setTgl_pinjam(Date tgl_pinjam) {
+    public void setTgl_pinjam(String tgl_pinjam) {
         this.tgl_pinjam = tgl_pinjam;
     }
 
-    public Date getJatuh_tempo() {
+    public String getJatuh_tempo() {
         return jatuh_tempo;
     }
 
-    public void setJatuh_tempo(Date jatuh_tempo) {
+    public void setJatuh_tempo(String jatuh_tempo) {
         this.jatuh_tempo = jatuh_tempo;
     }
 

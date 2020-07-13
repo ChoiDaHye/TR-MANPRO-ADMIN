@@ -11,7 +11,7 @@ import models.m_vcd;
 
 public class Vcd_edit extends javax.swing.JFrame {
 
-    String param, iden;
+    private String param, iden;
 
     /**
      * Creates new form Customer_add

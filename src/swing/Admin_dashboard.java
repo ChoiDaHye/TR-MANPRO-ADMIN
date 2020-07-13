@@ -16,6 +16,8 @@ import javax.swing.table.TableRowSorter;
 import models.m_customer;
 import models.m_harga;
 import models.m_karyawan;
+import models.m_pinjam;
+import models.m_pinjam_det;
 import models.m_vcd;
 
 public class Admin_dashboard extends javax.swing.JFrame {
@@ -26,7 +28,92 @@ public class Admin_dashboard extends javax.swing.JFrame {
     String d_id_vcd, d_id_customer, d_id_karyawan, d_id_harga, p_id_customer;
 
     //for indentity
-    String log_id, log_name, log_level;
+    String log_id, log_name, log_level, booking_id;
+
+    // METHOD PINJAM
+    void pinjam_tampil() {
+        Object[] baris = {"KODE BOOKING", "CUSTOMER", "KARYAWAN", "TANGGAL", "JATUH TEMPO", "TOTAL HARGA"};
+        DefaultTableModel dt = new DefaultTableModel(null, baris);
+        tb_pinjam.setModel(dt);
+
+        try {
+            dao_pinjam dao = new dao_pinjam();
+            List<m_pinjam> data = dao.readPinjam();
+
+            for (m_pinjam d : data) {
+                String total = Float.toString(d.getHarga_total());
+                String[] isi = {d.getId_pinjam(), dao.getCus(d.getId_customer()), dao.getKar(d.getId_karyawan()), d.getTgl_pinjam(), d.getJatuh_tempo(), total};
+                dt.addRow(isi);
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    void tb_pinjam_klik() {
+        int row = tb_pinjam.getSelectedRow();
+        String id_pinjam = tb_pinjam.getModel().getValueAt(row, 0).toString();
+
+        Object[] baris = {"ID VCD", "JUDUL", "JUMLAH", "SUBTOTAL"};
+        DefaultTableModel dt = new DefaultTableModel(null, baris);
+        tb_pinjam_det.setModel(dt);
+        dt.setRowCount(0);
+
+        try {
+            dao_pinjam dao = new dao_pinjam();
+            List<m_pinjam_det> data = dao.readDetail(id_pinjam);
+
+            for (m_pinjam_det d : data) {
+                String subtotal = Float.toString(d.getSubtotal());
+                String jumlah = Integer.toString(d.getJumlah());
+                String[] isi = {d.getId_vcd(), dao.getJudul(d.getId_vcd()), jumlah, subtotal};
+                dt.addRow(isi);
+            }
+        } catch (Exception e) {
+        }
+    }
+    
+    // METHOD KEMBALI
+    void kembali_tampil() {
+        Object[] baris = {"KODE BOOKING", "CUSTOMER", "KARYAWAN", "TANGGAL", "JATUH TEMPO", "TOTAL HARGA"};
+        DefaultTableModel dt = new DefaultTableModel(null, baris);
+        tb_kembali.setModel(dt);
+
+        try {
+            dao_kembali dao = new dao_kembali();
+            List<m_pinjam> data = dao.readPinjam();
+
+            for (m_pinjam d : data) {
+                String total = Float.toString(d.getHarga_total());
+                String[] isi = {d.getId_pinjam(), dao.getCus(d.getId_customer()), dao.getKar(d.getId_karyawan()), d.getTgl_pinjam(), d.getJatuh_tempo(), total};
+                dt.addRow(isi);
+            }
+        } catch (Exception e) {
+        }
+    }
+
+    void tb_kembali_klik() {
+        int row = tb_kembali.getSelectedRow();
+        String id_pinjam = tb_kembali.getModel().getValueAt(row, 0).toString();
+        booking_id = tb_kembali.getModel().getValueAt(row, 0).toString();
+
+        Object[] baris = {"ID VCD", "JUDUL", "JUMLAH", "KEMBALI"};
+        DefaultTableModel dt = new DefaultTableModel(null, baris);
+        jTable2.setModel(dt);
+        dt.setRowCount(0);
+
+        try {
+            dao_kembali dao = new dao_kembali();
+            List<m_pinjam_det> data = dao.readDetail(id_pinjam);
+
+            for (m_pinjam_det d : data) {
+                String kembali = Integer.toString(d.getKembali());
+                String jumlah = Integer.toString(d.getJumlah());                
+                String[] isi = {d.getId_vcd(), dao.getJudul(d.getId_vcd()), jumlah, kembali};
+                dt.addRow(isi);
+            }
+        } catch (Exception e) {
+        }
+    }
 
     // METHOD PROFIL
     void profil_tampil() {
@@ -361,6 +448,8 @@ public class Admin_dashboard extends javax.swing.JFrame {
         frameNonactive(lp_laporan);
         frameNonactive(lp_keluar);
 
+        pinjam_tampil();
+
         jLabel120.setText("<html>Pastikan kamu sudah memasukkan data pelanggan dengan benar dan <br>periksa semua VCD yang disewa ada di keranjang<html>");
     }
 
@@ -387,6 +476,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
         frameNonactive(lp_harga);
         frameNonactive(lp_laporan);
         frameNonactive(lp_keluar);
+        kembali_tampil();
 
         jLabel123.setText("<html>Jangan lupa minta kode booking dari pelanggan dan periksa kondisi VCD yang dipinjam ya<html>");
     }
@@ -685,11 +775,10 @@ public class Admin_dashboard extends javax.swing.JFrame {
         jLabel120 = new javax.swing.JLabel();
         jScrollPane9 = new javax.swing.JScrollPane();
         tb_pinjam = new javax.swing.JTable();
-        pinjam_btn_tambah = new javax.swing.JPanel();
-        jLabel121 = new javax.swing.JLabel();
         pinjam_txt_cari = new javax.swing.JTextField();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tb_pinjam_det = new javax.swing.JTable();
+        pinjam_btn_tambah = new javax.swing.JButton();
         pengembalian = new javax.swing.JPanel();
         jLabel122 = new javax.swing.JLabel();
         jLabel123 = new javax.swing.JLabel();
@@ -698,10 +787,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
         kembali_txt_cari = new javax.swing.JTextField();
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable2 = new javax.swing.JTable();
-        pinjam_btn_tambah1 = new javax.swing.JPanel();
-        jLabel124 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox<>();
-        jButton1 = new javax.swing.JButton();
+        jButton4 = new javax.swing.JButton();
         profile = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jLabel8 = new javax.swing.JLabel();
@@ -1769,59 +1855,39 @@ public class Admin_dashboard extends javax.swing.JFrame {
         tb_pinjam.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         tb_pinjam.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"P0001", "C0001", "K0001", "16/06/2020", "23/06/2020", "30000.00"}
+
             },
             new String [] {
-                "ID", "Customer", "Karyawan", "Tanggal", "Jatuh tempo", "Harga"
+
             }
         ));
+        tb_pinjam.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tb_pinjamMouseClicked(evt);
+            }
+        });
         jScrollPane9.setViewportView(tb_pinjam);
-        if (tb_pinjam.getColumnModel().getColumnCount() > 0) {
-            tb_pinjam.getColumnModel().getColumn(3).setMinWidth(100);
-            tb_pinjam.getColumnModel().getColumn(3).setMaxWidth(100);
-            tb_pinjam.getColumnModel().getColumn(4).setMinWidth(100);
-            tb_pinjam.getColumnModel().getColumn(4).setMaxWidth(100);
-            tb_pinjam.getColumnModel().getColumn(5).setMinWidth(100);
-            tb_pinjam.getColumnModel().getColumn(5).setMaxWidth(100);
-        }
-
-        pinjam_btn_tambah.setBackground(new java.awt.Color(204, 204, 204));
-        pinjam_btn_tambah.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204), 2));
-        pinjam_btn_tambah.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        jLabel121.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        jLabel121.setText("Baru");
-
-        javax.swing.GroupLayout pinjam_btn_tambahLayout = new javax.swing.GroupLayout(pinjam_btn_tambah);
-        pinjam_btn_tambah.setLayout(pinjam_btn_tambahLayout);
-        pinjam_btn_tambahLayout.setHorizontalGroup(
-            pinjam_btn_tambahLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pinjam_btn_tambahLayout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(jLabel121)
-                .addGap(15, 15, 15))
-        );
-        pinjam_btn_tambahLayout.setVerticalGroup(
-            pinjam_btn_tambahLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pinjam_btn_tambahLayout.createSequentialGroup()
-                .addGap(3, 3, 3)
-                .addComponent(jLabel121)
-                .addGap(3, 3, 3))
-        );
 
         pinjam_txt_cari.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        pinjam_txt_cari.setText("  Cari data");
         pinjam_txt_cari.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tb_pinjam_det.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"V0001", "2", "30000.00"}
+
             },
             new String [] {
-                "VCD", "Jumlah", "Subtotal"
+
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        jScrollPane1.setViewportView(tb_pinjam_det);
+
+        pinjam_btn_tambah.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        pinjam_btn_tambah.setText("Baru");
+        pinjam_btn_tambah.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                pinjam_btn_tambahActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout peminjamanLayout = new javax.swing.GroupLayout(peminjaman);
         peminjaman.setLayout(peminjamanLayout);
@@ -1829,16 +1895,17 @@ public class Admin_dashboard extends javax.swing.JFrame {
             peminjamanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(peminjamanLayout.createSequentialGroup()
                 .addGap(45, 45, 45)
-                .addGroup(peminjamanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, peminjamanLayout.createSequentialGroup()
-                        .addComponent(pinjam_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(peminjamanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(peminjamanLayout.createSequentialGroup()
+                        .addGroup(peminjamanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(pinjam_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel119)
+                            .addComponent(jLabel120, javax.swing.GroupLayout.DEFAULT_SIZE, 810, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pinjam_btn_tambah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel119, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel120, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)
-                    .addComponent(jScrollPane9, javax.swing.GroupLayout.Alignment.LEADING)
+                        .addComponent(pinjam_btn_tambah))
+                    .addComponent(jScrollPane9, javax.swing.GroupLayout.DEFAULT_SIZE, 900, Short.MAX_VALUE)
                     .addComponent(jScrollPane1))
-                .addContainerGap(515, Short.MAX_VALUE))
+                .addContainerGap(45, Short.MAX_VALUE))
         );
         peminjamanLayout.setVerticalGroup(
             peminjamanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1848,15 +1915,17 @@ public class Admin_dashboard extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addComponent(jLabel120)
                 .addGap(20, 20, 20)
-                .addGroup(peminjamanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(pinjam_btn_tambah, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(pinjam_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(15, 15, 15)
+                .addGroup(peminjamanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(pinjam_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(pinjam_btn_tambah))
+                .addGap(14, 14, 14)
                 .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap(82, Short.MAX_VALUE))
         );
+
+        peminjamanLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {pinjam_btn_tambah, pinjam_txt_cari});
 
         right_panel.add(peminjaman, "card3");
 
@@ -1872,13 +1941,17 @@ public class Admin_dashboard extends javax.swing.JFrame {
         tb_kembali.setFont(new java.awt.Font("Segoe UI", 0, 12)); // NOI18N
         tb_kembali.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"B0001", "Rehuel Paskahrio", "0.00", "Berjalan"},
-                {"B0002", "Henry", "0.00", "Berjalan"}
+
             },
             new String [] {
                 "Kode Booking", "Peminjaman", "Denda", "Status"
             }
         ));
+        tb_kembali.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tb_kembaliMouseClicked(evt);
+            }
+        });
         jScrollPane10.setViewportView(tb_kembali);
         if (tb_kembali.getColumnModel().getColumnCount() > 0) {
             tb_kembali.getColumnModel().getColumn(2).setMinWidth(100);
@@ -1888,12 +1961,12 @@ public class Admin_dashboard extends javax.swing.JFrame {
         }
 
         kembali_txt_cari.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        kembali_txt_cari.setText("  Cari data");
+        kembali_txt_cari.setText(" ");
         kembali_txt_cari.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {"V0001", "2", "0", "0.00", "Yosef Febrianes"}
+
             },
             new String [] {
                 "VCD", "JUMLAH", "RUSAK", "DENDA", "KARYAWAN"
@@ -1901,36 +1974,11 @@ public class Admin_dashboard extends javax.swing.JFrame {
         ));
         jScrollPane2.setViewportView(jTable2);
 
-        pinjam_btn_tambah1.setBackground(new java.awt.Color(204, 204, 204));
-        pinjam_btn_tambah1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(204, 204, 204), 2));
-        pinjam_btn_tambah1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-
-        jLabel124.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        jLabel124.setText("Proses");
-
-        javax.swing.GroupLayout pinjam_btn_tambah1Layout = new javax.swing.GroupLayout(pinjam_btn_tambah1);
-        pinjam_btn_tambah1.setLayout(pinjam_btn_tambah1Layout);
-        pinjam_btn_tambah1Layout.setHorizontalGroup(
-            pinjam_btn_tambah1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pinjam_btn_tambah1Layout.createSequentialGroup()
-                .addGap(15, 15, 15)
-                .addComponent(jLabel124)
-                .addGap(15, 15, 15))
-        );
-        pinjam_btn_tambah1Layout.setVerticalGroup(
-            pinjam_btn_tambah1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pinjam_btn_tambah1Layout.createSequentialGroup()
-                .addGap(3, 3, 3)
-                .addComponent(jLabel124)
-                .addGap(3, 3, 3))
-        );
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Kode Booking", "Judul VCD", "Peminjam" }));
-
-        jButton1.setText("Cari");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButton4.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
+        jButton4.setText("Proses");
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButton4ActionPerformed(evt);
             }
         });
 
@@ -1940,20 +1988,19 @@ public class Admin_dashboard extends javax.swing.JFrame {
             pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(pengembalianLayout.createSequentialGroup()
                 .addGap(45, 45, 45)
-                .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pengembalianLayout.createSequentialGroup()
-                        .addComponent(kembali_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addComponent(jButton1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(pinjam_btn_tambah1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jLabel122, javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel123, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 699, Short.MAX_VALUE)
-                    .addComponent(jScrollPane10, javax.swing.GroupLayout.Alignment.LEADING)
+                .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addGroup(pengembalianLayout.createSequentialGroup()
+                        .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pengembalianLayout.createSequentialGroup()
+                                .addComponent(kembali_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(175, 175, 175))
+                            .addComponent(jLabel122, javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel123, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 796, Short.MAX_VALUE))
+                        .addGap(37, 37, 37)
+                        .addComponent(jButton4))
+                    .addComponent(jScrollPane10)
                     .addComponent(jScrollPane2))
-                .addContainerGap(515, Short.MAX_VALUE))
+                .addContainerGap(314, Short.MAX_VALUE))
         );
         pengembalianLayout.setVerticalGroup(
             pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -1963,19 +2010,17 @@ public class Admin_dashboard extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addComponent(jLabel123)
                 .addGap(20, 20, 20)
-                .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pengembalianLayout.createSequentialGroup()
-                        .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(kembali_txt_cari, javax.swing.GroupLayout.DEFAULT_SIZE, 32, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jComboBox1))
-                        .addGap(15, 15, 15)
-                        .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(20, 20, 20)
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(pinjam_btn_tambah1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(kembali_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(20, 20, 20)
+                .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(80, 80, 80))
         );
+
+        pengembalianLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton4, kembali_txt_cari});
 
         right_panel.add(pengembalian, "card4");
 
@@ -2992,10 +3037,6 @@ public class Admin_dashboard extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_profile_txt_alamatActionPerformed
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jButton1ActionPerformed
-
     private void karyawan_btn_editActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_karyawan_btn_editActionPerformed
         if (d_id_karyawan == null) {
             JOptionPane.showMessageDialog(null, "Mohon pilih dahulu data yang akan diedit pada tabel!", "Oops", JOptionPane.WARNING_MESSAGE);
@@ -3191,6 +3232,24 @@ public class Admin_dashboard extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_vcd_btn_restockActionPerformed
 
+    private void pinjam_btn_tambahActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_pinjam_btn_tambahActionPerformed
+        Trans_pinjam_cari pinjam = new Trans_pinjam_cari(log_id);
+        pinjam.setVisible(true);
+    }//GEN-LAST:event_pinjam_btn_tambahActionPerformed
+
+    private void tb_pinjamMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tb_pinjamMouseClicked
+        tb_pinjam_klik();
+    }//GEN-LAST:event_tb_pinjamMouseClicked
+
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        Trans_kembali kembali = new Trans_kembali(log_id,booking_id);
+        kembali.setVisible(true);
+    }//GEN-LAST:event_jButton4ActionPerformed
+
+    private void tb_kembaliMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tb_kembaliMouseClicked
+        tb_kembali_klik();
+    }//GEN-LAST:event_tb_kembaliMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -3252,10 +3311,9 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JButton harga_btn_refresh;
     private javax.swing.JButton harga_btn_tambah;
     private javax.swing.JTextField harga_txt_cari;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
-    private javax.swing.JComboBox<String> jComboBox1;
+    private javax.swing.JButton jButton4;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel100;
@@ -3270,10 +3328,8 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel119;
     private javax.swing.JLabel jLabel12;
     private javax.swing.JLabel jLabel120;
-    private javax.swing.JLabel jLabel121;
     private javax.swing.JLabel jLabel122;
     private javax.swing.JLabel jLabel123;
-    private javax.swing.JLabel jLabel124;
     private javax.swing.JLabel jLabel13;
     private javax.swing.JLabel jLabel14;
     private javax.swing.JLabel jLabel15;
@@ -3341,7 +3397,6 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane6;
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane9;
-    private javax.swing.JTable jTable1;
     private javax.swing.JTable jTable2;
     private javax.swing.JPanel karyawan;
     private javax.swing.JButton karyawan_btn_edit;
@@ -3364,8 +3419,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JPanel lp_vcd;
     private javax.swing.JPanel peminjaman;
     private javax.swing.JPanel pengembalian;
-    private javax.swing.JPanel pinjam_btn_tambah;
-    private javax.swing.JPanel pinjam_btn_tambah1;
+    private javax.swing.JButton pinjam_btn_tambah;
     private javax.swing.JTextField pinjam_txt_cari;
     private javax.swing.JPanel profile;
     private javax.swing.JButton profile_btn_ganti;
@@ -3382,6 +3436,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JTable tb_karyawan;
     private javax.swing.JTable tb_kembali;
     private javax.swing.JTable tb_pinjam;
+    private javax.swing.JTable tb_pinjam_det;
     private javax.swing.JTable tb_vcd;
     private javax.swing.JPanel vcd;
     private javax.swing.JButton vcd_btn_edit;
