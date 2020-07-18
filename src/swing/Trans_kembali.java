@@ -1,14 +1,24 @@
 package swing;
 
 import dao.dao_kembali;
+import dao.dao_pinjam;
 import java.awt.GraphicsEnvironment;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.text.NumberFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
+import models.m_kembali;
+import models.m_kembali_det;
 import models.m_keranjang_2;
 import models.m_pinjam_det;
 
@@ -19,21 +29,40 @@ public class Trans_kembali extends javax.swing.JFrame {
      */
     private String log_id, booking_id, id_vcd;
     private int cek;
-    private List<m_keranjang_2> keranjang = new ArrayList<m_keranjang_2>();
+    private float d_total, d_rusak, d_telat = 0;
+    private List<m_keranjang_2> keranjang = new ArrayList<>();
 
     public Trans_kembali(String kary, String id) {
         initComponents();
-
+        
         log_id = kary;
         booking_id = id;
-        kembali_txt_booking.setText(booking_id);
-        tb_detail_pesanan();
-        jLabel6.setText("<html>Jangan lupa minta kode booking dari pelanggan dan periksa kondisi VCD yang dipinjam ya<html>");
+        tampil();
     }
-
+    
     public Trans_kembali() {
         initComponents();
-        jLabel6.setText("<html>Jangan lupa minta kode booking dari pelanggan dan periksa kondisi VCD yang dipinjam ya<html>");
+    }
+
+    void tampil(){
+        try {
+            dao_kembali dao = new dao_kembali();
+            String data = dao.getCode();
+            String date = LocalDate.now().plusDays(7).format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+            d_telat = dao.getDtelat(booking_id);
+            d_rusak = dao.getDrusak();
+            kembali_txt_booking.setText(booking_id);
+            kembali_txt_code.setText(data);
+            
+            NumberFormat nf = NumberFormat.getInstance(new Locale("da", "DK"));
+            kembali_txt_denda.setText(nf.format(d_telat));
+            
+            jLabel6.setText("<html>Jangan lupa minta kode booking dari pelanggan dan periksa kondisi VCD yang dipinjam ya<html>");
+
+            tb_detail_pesanan();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Gagal mendapatkan data\n" + e, "Gagal", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     void tb_detail_pesanan() {
@@ -61,6 +90,7 @@ public class Trans_kembali extends javax.swing.JFrame {
 
     void tb_klik() {
         int row = tb_kembali.getSelectedRow();
+        id_vcd = tb_kembali.getModel().getValueAt(row, 0).toString();
         int baik = Integer.parseInt(tb_kembali.getModel().getValueAt(row, 2).toString());
         int buruk = 0;
         
@@ -69,45 +99,92 @@ public class Trans_kembali extends javax.swing.JFrame {
         kembali_txt_rusak.setText(Integer.toString(buruk));        
     }
     
-//    void tb_vcd_to_basket(String id, int bk, int rk) {
-//        try {
-//            dao_kembali dao = new dao_kembali();
-//
-//            float denda = dao.getDrusak();
-//            float sub = rk * denda;
-//
-//            if (keranjang.isEmpty()) {
-//                keranjang.add(new m_keranjang_2(id, bk, rk, sub));
-//            } else {
-//                int i = 0;
-//                boolean cek = false;
-//
-//                for (m_keranjang_2 k : keranjang) {
-//                    if (k.getId().equals(id)) {
-//                        cek = true;
-//                        int newjm = k.getJumlah() + jm;
-//                        float newsub = k.getSubtotal() + sub;
-//                        keranjang.set(i, new m_keranjang(id, jd, newjm, newsub));
-//                    }
-//                    i++;
-//                }
-//
-//                if (!cek) {
-//                    keranjang.add(new m_keranjang(id, jd, jm, sub));
-//                }
-//            }
-//
-//            tampil_keranjang();
-//            hit_total();
-//
-//            log_jd = "";
-//            log_vcd = "";
-//            log_sup = 0;
-//            pinjam_txt_qty.setText("");
-//        } catch (Exception e) {
-//            JOptionPane.showMessageDialog(null, "Gagal mendapatkan data\n" + e, "Gagal", JOptionPane.ERROR_MESSAGE);
-//        }
-//    }
+    void tb_vcd_to_basket(String id, int bk, int rk) {
+        try {
+            dao_kembali dao = new dao_kembali();
+            float sub = rk * d_rusak;
+            keranjang.add(new m_keranjang_2(id, bk, rk, sub));
+            
+            tampil_keranjang();
+            hit_total();
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Gagal mendapatkan data\n" + e, "Gagal", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    void tampil_keranjang() {
+        try {
+            DefaultTableModel model = (DefaultTableModel) tb_kembali_keranjang.getModel();
+            model.setRowCount(0);
+            NumberFormat nf = NumberFormat.getInstance(new Locale("da", "DK"));
+            for (m_keranjang_2 k : keranjang) {
+                String[] isi = {k.getId(), Integer.toString(k.getBaik()), Integer.toString(k.getBuruk()), nf.format(k.getSubdenda())};
+                model.addRow(isi);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Gagal mendapatkan data\n" + e, "Gagal", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    void hit_total(){
+        d_total = 0;
+        try {
+            d_total += d_telat;
+            for(m_keranjang_2 k : keranjang){
+                d_total += k.getSubdenda();
+            }
+            
+            NumberFormat nf = NumberFormat.getInstance(new Locale("da", "DK"));
+            kembali_txt_denda.setText(nf.format(d_total));
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Gagal mendapatkan data\n" + e, "Gagal", JOptionPane.ERROR_MESSAGE);
+        }
+    }
+    
+    void simpan_trans(String code, Float bayar){
+        try {
+            dao_kembali dao = new dao_kembali();
+            m_kembali data1 = new m_kembali();
+            String date = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+            Boolean c1 = false, c2 = false;
+            
+            data1.setId_kembali(code);
+            data1.setTgl_kembali(date);
+            data1.setDenda_total(d_total);
+            data1.setId_pinjam(booking_id);
+            data1.setId_karyawan(log_id);
+            
+            if(dao.simpanTrans(data1)){
+                c1 = true;
+                for (m_keranjang_2 k : keranjang){
+                    m_kembali_det data2 = new m_kembali_det();
+                    
+                    data2.setId_kembali(code);
+                    data2.setId_vcd(k.getId());
+                    data2.setJumlah(k.getBaik() + k.getBuruk());
+                    data2.setKondisi_rusak(k.getBuruk());
+                    data2.setDenda(k.getSubdenda());
+                    
+                    if (dao.simpanTransDet(data2, booking_id)) {
+                        c2 = true;
+                    }
+                }
+            }
+            
+            if (c1 && c2) {
+                JOptionPane.showMessageDialog(null, "Transaksi berhasil!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Kembalian \nRp. " + (bayar - d_total), "Info", JOptionPane.INFORMATION_MESSAGE);
+//                dao.struk(kb, by);
+                this.dispose();
+            } else {
+                JOptionPane.showMessageDialog(null, "Maaf, transaksi gagal!", "Gagal", JOptionPane.ERROR_MESSAGE);
+                System.out.println(c1);
+                System.out.println(c2);
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menyimpan data.\n" + e, "Gagal", JOptionPane.ERROR_MESSAGE);
+        }
+    }
     
     void acceptNUMBER(JTextField tf) {
         tf.addKeyListener(new KeyAdapter() {
@@ -145,10 +222,10 @@ public class Trans_kembali extends javax.swing.JFrame {
         jLabel5 = new javax.swing.JLabel();
         jLabel6 = new javax.swing.JLabel();
         jPanel1 = new javax.swing.JPanel();
-        kembali_txt_booking = new javax.swing.JTextField();
+        kembali_txt_code = new javax.swing.JTextField();
         kembali_txt_baik = new javax.swing.JTextField();
         kembali_txt_rusak = new javax.swing.JTextField();
-        kembali_txt_harga = new javax.swing.JTextField();
+        kembali_txt_denda = new javax.swing.JTextField();
         kembali_txt_bayar = new javax.swing.JTextField();
         jButton2 = new javax.swing.JButton();
         kembali_btn_proses1 = new javax.swing.JPanel();
@@ -160,11 +237,13 @@ public class Trans_kembali extends javax.swing.JFrame {
         jLabel8 = new javax.swing.JLabel();
         jLabel9 = new javax.swing.JLabel();
         jLabel10 = new javax.swing.JLabel();
+        kembali_txt_booking = new javax.swing.JTextField();
+        jLabel3 = new javax.swing.JLabel();
         jPanel2 = new javax.swing.JPanel();
         jScrollPane8 = new javax.swing.JScrollPane();
         tb_kembali = new javax.swing.JTable();
         jScrollPane1 = new javax.swing.JScrollPane();
-        jTable1 = new javax.swing.JTable();
+        tb_kembali_keranjang = new javax.swing.JTable();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Transaksi pengembalian");
@@ -182,10 +261,10 @@ public class Trans_kembali extends javax.swing.JFrame {
 
         jPanel1.setBackground(new java.awt.Color(255, 255, 255));
 
-        kembali_txt_booking.setEditable(false);
-        kembali_txt_booking.setBackground(new java.awt.Color(244, 244, 244));
-        kembali_txt_booking.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        kembali_txt_booking.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
+        kembali_txt_code.setEditable(false);
+        kembali_txt_code.setBackground(new java.awt.Color(244, 244, 244));
+        kembali_txt_code.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        kembali_txt_code.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
         kembali_txt_baik.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         kembali_txt_baik.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
@@ -206,13 +285,21 @@ public class Trans_kembali extends javax.swing.JFrame {
             }
         });
 
-        kembali_txt_harga.setEditable(false);
-        kembali_txt_harga.setBackground(new java.awt.Color(244, 244, 244));
-        kembali_txt_harga.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
-        kembali_txt_harga.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
+        kembali_txt_denda.setEditable(false);
+        kembali_txt_denda.setBackground(new java.awt.Color(244, 244, 244));
+        kembali_txt_denda.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        kembali_txt_denda.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        kembali_txt_denda.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
 
         kembali_txt_bayar.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        kembali_txt_bayar.setHorizontalAlignment(javax.swing.JTextField.RIGHT);
+        kembali_txt_bayar.setText("0");
         kembali_txt_bayar.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
+        kembali_txt_bayar.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                kembali_txt_bayarKeyPressed(evt);
+            }
+        });
 
         jButton2.setFont(new java.awt.Font("Tahoma", 0, 12)); // NOI18N
         jButton2.setText("Proses");
@@ -225,6 +312,11 @@ public class Trans_kembali extends javax.swing.JFrame {
 
         kembali_btn_proses1.setBackground(new java.awt.Color(0, 120, 215));
         kembali_btn_proses1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        kembali_btn_proses1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                kembali_btn_proses1MouseClicked(evt);
+            }
+        });
 
         jLabel119.setFont(new java.awt.Font("Segoe UI Semibold", 0, 14)); // NOI18N
         jLabel119.setForeground(new java.awt.Color(255, 255, 255));
@@ -272,6 +364,15 @@ public class Trans_kembali extends javax.swing.JFrame {
         jLabel10.setForeground(new java.awt.Color(51, 51, 51));
         jLabel10.setText("Keranjang dan pembayaran");
 
+        kembali_txt_booking.setEditable(false);
+        kembali_txt_booking.setBackground(new java.awt.Color(244, 244, 244));
+        kembali_txt_booking.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        kembali_txt_booking.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
+
+        jLabel3.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(93, 93, 93));
+        jLabel3.setText("Kode pinjam");
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -286,20 +387,22 @@ public class Trans_kembali extends javax.swing.JFrame {
                             .addComponent(jLabel2)
                             .addComponent(jLabel4)
                             .addComponent(jLabel8)
-                            .addComponent(jLabel7))
+                            .addComponent(jLabel7)
+                            .addComponent(jLabel3))
                         .addGap(40, 40, 40)
                         .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                             .addComponent(kembali_txt_bayar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(kembali_txt_harga, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(kembali_txt_denda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(jButton2)
                             .addComponent(kembali_txt_rusak, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(kembali_txt_baik, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(kembali_txt_booking, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(kembali_btn_proses1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(kembali_txt_code, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(kembali_btn_proses1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(kembali_txt_booking, javax.swing.GroupLayout.PREFERRED_SIZE, 235, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addGap(0, 0, Short.MAX_VALUE))
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton2, kembali_btn_proses1, kembali_txt_baik, kembali_txt_bayar, kembali_txt_booking, kembali_txt_harga, kembali_txt_rusak});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {jButton2, kembali_btn_proses1, kembali_txt_baik, kembali_txt_bayar, kembali_txt_code, kembali_txt_denda, kembali_txt_rusak});
 
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -308,6 +411,10 @@ public class Trans_kembali extends javax.swing.JFrame {
                 .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jLabel1)
+                    .addComponent(kembali_txt_code, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(10, 10, 10)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
+                    .addComponent(jLabel3)
                     .addComponent(kembali_txt_booking, javax.swing.GroupLayout.PREFERRED_SIZE, 35, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(10, 10, 10)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
@@ -319,12 +426,12 @@ public class Trans_kembali extends javax.swing.JFrame {
                     .addComponent(kembali_txt_rusak, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(15, 15, 15)
                 .addComponent(jButton2)
-                .addGap(80, 80, 80)
+                .addGap(35, 35, 35)
                 .addComponent(jLabel10)
                 .addGap(15, 15, 15)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jLabel7)
-                    .addComponent(kembali_txt_harga, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(kembali_txt_denda, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(10, 10, 10)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(jLabel8)
@@ -334,7 +441,7 @@ public class Trans_kembali extends javax.swing.JFrame {
                 .addGap(0, 0, 0))
         );
 
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton2, kembali_txt_baik, kembali_txt_bayar, kembali_txt_booking, kembali_txt_harga, kembali_txt_rusak});
+        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton2, kembali_txt_baik, kembali_txt_bayar, kembali_txt_code, kembali_txt_denda, kembali_txt_rusak});
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -353,7 +460,7 @@ public class Trans_kembali extends javax.swing.JFrame {
         });
         jScrollPane8.setViewportView(tb_kembali);
 
-        jTable1.setModel(new javax.swing.table.DefaultTableModel(
+        tb_kembali_keranjang.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
 
             },
@@ -361,7 +468,12 @@ public class Trans_kembali extends javax.swing.JFrame {
                 "ID VCD", "BAIK", "RUSAK", "DENDA"
             }
         ));
-        jScrollPane1.setViewportView(jTable1);
+        tb_kembali_keranjang.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tb_kembali_keranjangMouseClicked(evt);
+            }
+        });
+        jScrollPane1.setViewportView(tb_kembali_keranjang);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -375,7 +487,7 @@ public class Trans_kembali extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addGap(35, 35, 35)
                 .addComponent(jScrollPane8, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(112, 112, 112)
+                .addGap(110, 110, 110)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 180, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 0, 0))
         );
@@ -462,16 +574,39 @@ public class Trans_kembali extends javax.swing.JFrame {
             int baik = Integer.parseInt(kembali_txt_baik.getText());
             int buruk= Integer.parseInt(kembali_txt_rusak.getText());
             
-            if((baik + buruk) > cek){
+            if((baik + buruk) > cek || (baik + buruk) <= 0){
                 JOptionPane.showMessageDialog(null, "Jumlah baik dan buruk tidak diterima!", "Kesalahan", JOptionPane.ERROR_MESSAGE);
                 kembali_txt_baik.setText(Integer.toString(cek));
                 kembali_txt_rusak.setText("0");
                 kembali_txt_baik.requestFocus();
             } else{
-                
+                tb_vcd_to_basket(id_vcd, baik, buruk);
+                kembali_txt_rusak.setText("");
+                kembali_txt_baik.setText("");
             }
         }
     }//GEN-LAST:event_jButton2ActionPerformed
+
+    private void tb_kembali_keranjangMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tb_kembali_keranjangMouseClicked
+//        int row = tb_kembali_keranjang.getSelectedRow();
+//        String vcd = tb_kembali_keranjang.getModel().getValueAt(row, 0).toString();
+    }//GEN-LAST:event_tb_kembali_keranjangMouseClicked
+
+    private void kembali_txt_bayarKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_kembali_txt_bayarKeyPressed
+        acceptNUMBER(kembali_txt_bayar);
+    }//GEN-LAST:event_kembali_txt_bayarKeyPressed
+
+    private void kembali_btn_proses1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_kembali_btn_proses1MouseClicked
+        if(kembali_txt_bayar.getText().equals("") || !numberOrNot(kembali_txt_bayar.getText())){
+            kembali_txt_bayar.requestFocus();
+        } else if(Float.parseFloat(kembali_txt_bayar.getText()) < d_total){
+            JOptionPane.showMessageDialog(null, "Nominal bayar tidak diterima!", "Kesalahan", JOptionPane.ERROR_MESSAGE);
+            kembali_txt_bayar.setText("");
+            kembali_txt_bayar.requestFocus();
+        } else{
+            simpan_trans(kembali_txt_code.getText(), Float.parseFloat(kembali_txt_bayar.getText()));
+        }
+    }//GEN-LAST:event_kembali_btn_proses1MouseClicked
 
     /**
      * @param args the command line arguments
@@ -514,6 +649,7 @@ public class Trans_kembali extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel119;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
@@ -524,14 +660,15 @@ public class Trans_kembali extends javax.swing.JFrame {
     private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane8;
-    private javax.swing.JTable jTable1;
     private javax.swing.JPanel kembali_btn_proses1;
     private javax.swing.JTextField kembali_txt_baik;
     private javax.swing.JTextField kembali_txt_bayar;
     private javax.swing.JTextField kembali_txt_booking;
-    private javax.swing.JTextField kembali_txt_harga;
+    private javax.swing.JTextField kembali_txt_code;
+    private javax.swing.JTextField kembali_txt_denda;
     private javax.swing.JTextField kembali_txt_rusak;
     private javax.swing.JPanel pengembalian;
     private javax.swing.JTable tb_kembali;
+    private javax.swing.JTable tb_kembali_keranjang;
     // End of variables declaration//GEN-END:variables
 }

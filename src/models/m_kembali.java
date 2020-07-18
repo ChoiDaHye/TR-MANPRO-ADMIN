@@ -3,9 +3,19 @@ package models;
 import java.util.Date;
 
 public class m_kembali {
-    private String id_kembali, id_pinjam, id_karyawan;
-    private Date tgl_kembali;
+    private String id_kembali, id_pinjam, id_karyawan, tgl_kembali;
     private float denda_total;
+
+    public m_kembali(String id_kembali, String id_pinjam, String id_karyawan, String tgl_kembali, float denda_total) {
+        this.id_kembali = id_kembali;
+        this.id_pinjam = id_pinjam;
+        this.id_karyawan = id_karyawan;
+        this.tgl_kembali = tgl_kembali;
+        this.denda_total = denda_total;
+    }
+
+    public m_kembali() {
+    }
 
     public String getId_kembali() {
         return id_kembali;
@@ -31,11 +41,11 @@ public class m_kembali {
         this.id_karyawan = id_karyawan;
     }
 
-    public Date getTgl_kembali() {
+    public String getTgl_kembali() {
         return tgl_kembali;
     }
 
-    public void setTgl_kembali(Date tgl_kembali) {
+    public void setTgl_kembali(String tgl_kembali) {
         this.tgl_kembali = tgl_kembali;
     }
 

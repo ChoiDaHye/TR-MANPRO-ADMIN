@@ -1,14 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package models;
 
-/**
- *
- * @author dgeda
- */
 public class m_kembali_det {
     String id_kembali, id_vcd;
     int jumlah, kondisi_rusak;
