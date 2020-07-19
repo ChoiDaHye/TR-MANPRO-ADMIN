@@ -11,8 +11,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.TableRowSorter;
+import jxl.write.WriteException;
 import models.m_customer;
 import models.m_harga;
 import models.m_karyawan;
@@ -71,7 +74,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
         } catch (Exception e) {
         }
     }
-    
+
     // METHOD KEMBALI
     void kembali_tampil() {
         Object[] baris = {"KODE BOOKING", "CUSTOMER", "KARYAWAN", "TANGGAL", "JATUH TEMPO", "TOTAL HARGA"};
@@ -107,7 +110,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
 
             for (m_pinjam_det d : data) {
                 String kembali = Integer.toString(d.getKembali());
-                String jumlah = Integer.toString(d.getJumlah());                
+                String jumlah = Integer.toString(d.getJumlah());
                 String[] isi = {d.getId_vcd(), dao.getJudul(d.getId_vcd()), jumlah, kembali};
                 dt.addRow(isi);
             }
@@ -644,7 +647,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
         frameActive(lp_laporan);
         frameNonactive(lp_keluar);
 
-        jLabel16.setText("<html>Mari lihat pencapaian apa saja yang sudah kita buat melalui datan grafik dibawah ini</html>");
+        jLabel16.setText("<html>Mari lihat pencapaian apa saja yang sudah kita buat melalui data</html>");
     }
 
     private void keluar() {
@@ -852,7 +855,21 @@ public class Admin_dashboard extends javax.swing.JFrame {
         laporan = new javax.swing.JPanel();
         jLabel15 = new javax.swing.JLabel();
         jLabel16 = new javax.swing.JLabel();
-        jLabel106 = new javax.swing.JLabel();
+        lap_pendapatan = new javax.swing.JPanel();
+        jLabel45 = new javax.swing.JLabel();
+        jdhjashg = new javax.swing.JLabel();
+        lap_vcd = new javax.swing.JPanel();
+        jLabel66 = new javax.swing.JLabel();
+        jLabel67 = new javax.swing.JLabel();
+        lap_restock = new javax.swing.JPanel();
+        jLabel69 = new javax.swing.JLabel();
+        jLabel70 = new javax.swing.JLabel();
+        lap_pinjam = new javax.swing.JPanel();
+        jLabel72 = new javax.swing.JLabel();
+        jLabel73 = new javax.swing.JLabel();
+        lap_kembali = new javax.swing.JPanel();
+        jLabel75 = new javax.swing.JLabel();
+        jLabel76 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Home Cinema");
@@ -1838,7 +1855,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                     .addComponent(d_customer, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(d_keluar, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(70, Short.MAX_VALUE))
+                .addContainerGap(369, Short.MAX_VALUE))
         );
 
         right_panel.add(dashboard, "card2");
@@ -1922,7 +1939,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                 .addComponent(jScrollPane9, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(18, 18, 18)
                 .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(82, Short.MAX_VALUE))
+                .addContainerGap(381, Short.MAX_VALUE))
         );
 
         peminjamanLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {pinjam_btn_tambah, pinjam_txt_cari});
@@ -1991,11 +2008,9 @@ public class Admin_dashboard extends javax.swing.JFrame {
                 .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(pengembalianLayout.createSequentialGroup()
                         .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, pengembalianLayout.createSequentialGroup()
-                                .addComponent(kembali_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(175, 175, 175))
-                            .addComponent(jLabel122, javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel123, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 796, Short.MAX_VALUE))
+                            .addComponent(jLabel123, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 796, Short.MAX_VALUE)
+                            .addComponent(kembali_txt_cari, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel122, javax.swing.GroupLayout.Alignment.LEADING))
                         .addGap(37, 37, 37)
                         .addComponent(jButton4))
                     .addComponent(jScrollPane10)
@@ -2013,7 +2028,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                 .addGroup(pengembalianLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(kembali_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jButton4, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 14, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 313, Short.MAX_VALUE)
                 .addComponent(jScrollPane10, javax.swing.GroupLayout.PREFERRED_SIZE, 233, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(20, 20, 20)
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -2197,7 +2212,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                     .addComponent(profile_txt_pass_new, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(15, 15, 15)
                 .addComponent(profile_btn_ganti)
-                .addContainerGap(40, Short.MAX_VALUE))
+                .addContainerGap(400, Short.MAX_VALUE))
         );
 
         profileLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton2, profile_btn_ganti, profile_txt_alamat, profile_txt_kontak, profile_txt_ktp, profile_txt_level, profile_txt_nama, profile_txt_pass_new, profile_txt_pass_old});
@@ -2324,7 +2339,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                     .addComponent(jButton3))
                 .addGap(15, 15, 15)
                 .addComponent(jScrollPane6, javax.swing.GroupLayout.PREFERRED_SIZE, 460, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(73, Short.MAX_VALUE))
+                .addContainerGap(372, Short.MAX_VALUE))
         );
 
         vcdLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton3, vcd_btn_edit, vcd_btn_hapus, vcd_btn_restock, vcd_btn_tambah, vcd_txt_cari});
@@ -2550,7 +2565,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                     .addComponent(karyawan_btn_hapus))
                 .addGap(15, 15, 15)
                 .addComponent(jScrollPane4, javax.swing.GroupLayout.PREFERRED_SIZE, 460, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(73, Short.MAX_VALUE))
+                .addContainerGap(372, Short.MAX_VALUE))
         );
 
         karyawanLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {karyawan_btn_edit, karyawan_btn_hapus, karyawan_btn_refresh, karyawan_btn_tambah, karyawan_txt_cari});
@@ -2661,7 +2676,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                     .addComponent(harga_txt_cari, javax.swing.GroupLayout.PREFERRED_SIZE, 32, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(15, 15, 15)
                 .addComponent(jScrollPane7, javax.swing.GroupLayout.PREFERRED_SIZE, 460, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(50, Short.MAX_VALUE))
+                .addContainerGap(372, Short.MAX_VALUE))
         );
 
         hargaLayout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {harga_btn_edit, harga_btn_hapus, harga_btn_refresh, harga_btn_tambah, harga_txt_cari});
@@ -2677,7 +2692,211 @@ public class Admin_dashboard extends javax.swing.JFrame {
         jLabel16.setForeground(new java.awt.Color(96, 96, 96));
         jLabel16.setText("Lorem ipsum dolor sit amet, consectetur adipiscing elit.");
 
-        jLabel106.setText("jLabel106");
+        lap_pendapatan.setBackground(new java.awt.Color(255, 255, 255));
+        lap_pendapatan.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 2));
+        lap_pendapatan.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lap_pendapatan.setPreferredSize(new java.awt.Dimension(230, 200));
+        lap_pendapatan.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lap_pendapatanMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lap_pendapatanMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lap_pendapatanMouseExited(evt);
+            }
+        });
+
+        jLabel45.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/lap-profit.png"))); // NOI18N
+
+        jdhjashg.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        jdhjashg.setText("Pendapatan");
+
+        javax.swing.GroupLayout lap_pendapatanLayout = new javax.swing.GroupLayout(lap_pendapatan);
+        lap_pendapatan.setLayout(lap_pendapatanLayout);
+        lap_pendapatanLayout.setHorizontalGroup(
+            lap_pendapatanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lap_pendapatanLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(lap_pendapatanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jdhjashg)
+                    .addComponent(jLabel45))
+                .addContainerGap(89, Short.MAX_VALUE))
+        );
+        lap_pendapatanLayout.setVerticalGroup(
+            lap_pendapatanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lap_pendapatanLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(jLabel45)
+                .addGap(15, 15, 15)
+                .addComponent(jdhjashg)
+                .addGap(15, 15, 15))
+        );
+
+        lap_vcd.setBackground(new java.awt.Color(255, 255, 255));
+        lap_vcd.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 2));
+        lap_vcd.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lap_vcd.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lap_vcdMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lap_vcdMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lap_vcdMouseExited(evt);
+            }
+        });
+
+        jLabel66.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/lap-vcd.png"))); // NOI18N
+
+        jLabel67.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        jLabel67.setText("Laporan data VCD");
+
+        javax.swing.GroupLayout lap_vcdLayout = new javax.swing.GroupLayout(lap_vcd);
+        lap_vcd.setLayout(lap_vcdLayout);
+        lap_vcdLayout.setHorizontalGroup(
+            lap_vcdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lap_vcdLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(lap_vcdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel67)
+                    .addComponent(jLabel66))
+                .addContainerGap(45, Short.MAX_VALUE))
+        );
+        lap_vcdLayout.setVerticalGroup(
+            lap_vcdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lap_vcdLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(jLabel66)
+                .addGap(15, 15, 15)
+                .addComponent(jLabel67)
+                .addGap(15, 15, 15))
+        );
+
+        lap_restock.setBackground(new java.awt.Color(255, 255, 255));
+        lap_restock.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 2));
+        lap_restock.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lap_restock.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lap_restockMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lap_restockMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lap_restockMouseExited(evt);
+            }
+        });
+
+        jLabel69.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/lap-stok.png"))); // NOI18N
+
+        jLabel70.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        jLabel70.setText("Laporan restock");
+
+        javax.swing.GroupLayout lap_restockLayout = new javax.swing.GroupLayout(lap_restock);
+        lap_restock.setLayout(lap_restockLayout);
+        lap_restockLayout.setHorizontalGroup(
+            lap_restockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lap_restockLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(lap_restockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel70)
+                    .addComponent(jLabel69))
+                .addContainerGap(60, Short.MAX_VALUE))
+        );
+        lap_restockLayout.setVerticalGroup(
+            lap_restockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lap_restockLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(jLabel69)
+                .addGap(15, 15, 15)
+                .addComponent(jLabel70)
+                .addGap(15, 15, 15))
+        );
+
+        lap_pinjam.setBackground(new java.awt.Color(255, 255, 255));
+        lap_pinjam.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 2));
+        lap_pinjam.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lap_pinjam.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lap_pinjamMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lap_pinjamMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lap_pinjamMouseExited(evt);
+            }
+        });
+
+        jLabel72.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/lap-trans.png"))); // NOI18N
+
+        jLabel73.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        jLabel73.setText("Laporan peminjaman");
+
+        javax.swing.GroupLayout lap_pinjamLayout = new javax.swing.GroupLayout(lap_pinjam);
+        lap_pinjam.setLayout(lap_pinjamLayout);
+        lap_pinjamLayout.setHorizontalGroup(
+            lap_pinjamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lap_pinjamLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(lap_pinjamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel73)
+                    .addComponent(jLabel72))
+                .addContainerGap(23, Short.MAX_VALUE))
+        );
+        lap_pinjamLayout.setVerticalGroup(
+            lap_pinjamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lap_pinjamLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(jLabel72)
+                .addGap(15, 15, 15)
+                .addComponent(jLabel73)
+                .addGap(15, 15, 15))
+        );
+
+        lap_kembali.setBackground(new java.awt.Color(255, 255, 255));
+        lap_kembali.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(255, 255, 255), 2));
+        lap_kembali.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        lap_kembali.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                lap_kembaliMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                lap_kembaliMouseEntered(evt);
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                lap_kembaliMouseExited(evt);
+            }
+        });
+
+        jLabel75.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/lap-trans.png"))); // NOI18N
+
+        jLabel76.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
+        jLabel76.setText("Laporan pengembalian");
+
+        javax.swing.GroupLayout lap_kembaliLayout = new javax.swing.GroupLayout(lap_kembali);
+        lap_kembali.setLayout(lap_kembaliLayout);
+        lap_kembaliLayout.setHorizontalGroup(
+            lap_kembaliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lap_kembaliLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addGroup(lap_kembaliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jLabel76)
+                    .addComponent(jLabel75))
+                .addContainerGap(11, Short.MAX_VALUE))
+        );
+        lap_kembaliLayout.setVerticalGroup(
+            lap_kembaliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(lap_kembaliLayout.createSequentialGroup()
+                .addGap(15, 15, 15)
+                .addComponent(jLabel75)
+                .addGap(15, 15, 15)
+                .addComponent(jLabel76)
+                .addGap(15, 15, 15))
+        );
 
         javax.swing.GroupLayout laporanLayout = new javax.swing.GroupLayout(laporan);
         laporan.setLayout(laporanLayout);
@@ -2686,21 +2905,44 @@ public class Admin_dashboard extends javax.swing.JFrame {
             .addGroup(laporanLayout.createSequentialGroup()
                 .addGap(45, 45, 45)
                 .addGroup(laporanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel106)
                     .addComponent(jLabel15)
-                    .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(514, Short.MAX_VALUE))
+                    .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(laporanLayout.createSequentialGroup()
+                        .addGroup(laporanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                            .addComponent(lap_pendapatan, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+                            .addComponent(lap_kembali, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGap(10, 10, 10)
+                        .addComponent(lap_vcd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(lap_restock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(10, 10, 10)
+                        .addComponent(lap_pinjam, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(246, Short.MAX_VALUE))
         );
+
+        laporanLayout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {lap_kembali, lap_pendapatan, lap_pinjam, lap_restock, lap_vcd});
+
         laporanLayout.setVerticalGroup(
             laporanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(laporanLayout.createSequentialGroup()
-                .addGap(50, 50, 50)
-                .addComponent(jLabel15)
-                .addGap(15, 15, 15)
-                .addComponent(jLabel16)
-                .addGap(20, 20, 20)
-                .addComponent(jLabel106)
-                .addContainerGap(566, Short.MAX_VALUE))
+                .addGroup(laporanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(laporanLayout.createSequentialGroup()
+                        .addGap(50, 50, 50)
+                        .addComponent(jLabel15)
+                        .addGap(15, 15, 15)
+                        .addComponent(jLabel16)
+                        .addGap(20, 20, 20)
+                        .addGroup(laporanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lap_pinjam, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lap_restock, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(laporanLayout.createSequentialGroup()
+                        .addGap(137, 137, 137)
+                        .addGroup(laporanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lap_vcd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lap_pendapatan, javax.swing.GroupLayout.PREFERRED_SIZE, 135, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addGap(10, 10, 10)
+                .addComponent(lap_kembali, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(573, Short.MAX_VALUE))
         );
 
         right_panel.add(laporan, "card9");
@@ -3125,6 +3367,8 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private void harga_btn_hapusActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_harga_btn_hapusActionPerformed
         if (d_id_harga == null) {
             JOptionPane.showMessageDialog(null, "Mohon pilih dahulu data yang akan diedit pada tabel!", "Oops", JOptionPane.WARNING_MESSAGE);
+        } else if (d_id_harga.equals("H0001") || d_id_harga.equals("H0002") || d_id_harga.equals("H0003")) {
+            JOptionPane.showMessageDialog(null, "Mohon maaf, data ini tidak boleh dihapus!", "Oops", JOptionPane.WARNING_MESSAGE);
         } else {
             int selection = JOptionPane.showConfirmDialog(null, "Hapus data?", "Konfirmasi", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
             if (selection == JOptionPane.OK_OPTION) {
@@ -3242,13 +3486,113 @@ public class Admin_dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_tb_pinjamMouseClicked
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        Trans_kembali kembali = new Trans_kembali(log_id,booking_id);
+        Trans_kembali kembali = new Trans_kembali(log_id, booking_id);
         kembali.setVisible(true);
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void tb_kembaliMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tb_kembaliMouseClicked
         tb_kembali_klik();
     }//GEN-LAST:event_tb_kembaliMouseClicked
+
+    private void lap_pendapatanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_pendapatanMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lap_pendapatanMouseClicked
+
+    private void lap_pendapatanMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_pendapatanMouseEntered
+        frameEnter(lap_pendapatan);
+    }//GEN-LAST:event_lap_pendapatanMouseEntered
+
+    private void lap_pendapatanMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_pendapatanMouseExited
+        frameExit(lap_pendapatan);
+    }//GEN-LAST:event_lap_pendapatanMouseExited
+
+    private void lap_vcdMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_vcdMouseClicked
+        int selection = JOptionPane.showConfirmDialog(null, "Buat file laporan VCD?", "Konfirmasi", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (selection == JOptionPane.OK_OPTION) {
+            try {
+                dao_laporan dao = new dao_laporan();
+                dao.lap_vcd();
+            } catch (IOException ex) {
+                Logger.getLogger(Admin_dashboard.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (WriteException ex) {
+                Logger.getLogger(Admin_dashboard.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_lap_vcdMouseClicked
+
+    private void lap_vcdMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_vcdMouseEntered
+        frameEnter(lap_vcd);
+    }//GEN-LAST:event_lap_vcdMouseEntered
+
+    private void lap_vcdMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_vcdMouseExited
+        frameExit(lap_vcd);
+    }//GEN-LAST:event_lap_vcdMouseExited
+
+    private void lap_restockMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_restockMouseClicked
+        int selection = JOptionPane.showConfirmDialog(null, "Buat file laporan Restock?", "Konfirmasi", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (selection == JOptionPane.OK_OPTION) {
+            try {
+                dao_laporan dao = new dao_laporan();
+                dao.lap_restock();
+            } catch (IOException ex) {
+                Logger.getLogger(Admin_dashboard.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (WriteException ex) {
+                Logger.getLogger(Admin_dashboard.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_lap_restockMouseClicked
+
+    private void lap_restockMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_restockMouseEntered
+        frameEnter(lap_restock);
+    }//GEN-LAST:event_lap_restockMouseEntered
+
+    private void lap_restockMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_restockMouseExited
+        frameExit(lap_restock);
+    }//GEN-LAST:event_lap_restockMouseExited
+
+    private void lap_pinjamMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_pinjamMouseClicked
+        int selection = JOptionPane.showConfirmDialog(null, "Buat file laporan Transaksi Peminjaman?", "Konfirmasi", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (selection == JOptionPane.OK_OPTION) {
+            try {
+                dao_laporan dao = new dao_laporan();
+                dao.lap_pinjam();
+            } catch (IOException ex) {
+                Logger.getLogger(Admin_dashboard.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (WriteException ex) {
+                Logger.getLogger(Admin_dashboard.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_lap_pinjamMouseClicked
+
+    private void lap_pinjamMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_pinjamMouseEntered
+        frameEnter(lap_pinjam);
+    }//GEN-LAST:event_lap_pinjamMouseEntered
+
+    private void lap_pinjamMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_pinjamMouseExited
+        frameExit(lap_pinjam);
+    }//GEN-LAST:event_lap_pinjamMouseExited
+
+    private void lap_kembaliMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_kembaliMouseClicked
+        int selection = JOptionPane.showConfirmDialog(null, "Buat file laporan Transaksi Pengembalian?", "Konfirmasi", JOptionPane.OK_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE);
+        if (selection == JOptionPane.OK_OPTION) {
+            try {
+                dao_laporan dao = new dao_laporan();
+                dao.lap_kembali();
+            } catch (IOException ex) {
+                Logger.getLogger(Admin_dashboard.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (WriteException ex) {
+                Logger.getLogger(Admin_dashboard.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+    }//GEN-LAST:event_lap_kembaliMouseClicked
+
+    private void lap_kembaliMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_kembaliMouseEntered
+        frameEnter(lap_kembali);
+    }//GEN-LAST:event_lap_kembaliMouseEntered
+
+    private void lap_kembaliMouseExited(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_kembaliMouseExited
+        frameExit(lap_kembali);
+    }//GEN-LAST:event_lap_kembaliMouseExited
 
     /**
      * @param args the command line arguments
@@ -3318,7 +3662,6 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel100;
     private javax.swing.JLabel jLabel101;
-    private javax.swing.JLabel jLabel106;
     private javax.swing.JLabel jLabel107;
     private javax.swing.JLabel jLabel108;
     private javax.swing.JLabel jLabel11;
@@ -3359,6 +3702,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel42;
     private javax.swing.JLabel jLabel43;
     private javax.swing.JLabel jLabel44;
+    private javax.swing.JLabel jLabel45;
     private javax.swing.JLabel jLabel48;
     private javax.swing.JLabel jLabel49;
     private javax.swing.JLabel jLabel50;
@@ -3377,7 +3721,15 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel63;
     private javax.swing.JLabel jLabel64;
     private javax.swing.JLabel jLabel65;
+    private javax.swing.JLabel jLabel66;
+    private javax.swing.JLabel jLabel67;
+    private javax.swing.JLabel jLabel69;
     private javax.swing.JLabel jLabel7;
+    private javax.swing.JLabel jLabel70;
+    private javax.swing.JLabel jLabel72;
+    private javax.swing.JLabel jLabel73;
+    private javax.swing.JLabel jLabel75;
+    private javax.swing.JLabel jLabel76;
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JLabel jLabel91;
@@ -3398,6 +3750,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JScrollPane jScrollPane7;
     private javax.swing.JScrollPane jScrollPane9;
     private javax.swing.JTable jTable2;
+    private javax.swing.JLabel jdhjashg;
     private javax.swing.JPanel karyawan;
     private javax.swing.JButton karyawan_btn_edit;
     private javax.swing.JButton karyawan_btn_hapus;
@@ -3405,6 +3758,11 @@ public class Admin_dashboard extends javax.swing.JFrame {
     private javax.swing.JButton karyawan_btn_tambah;
     private javax.swing.JTextField karyawan_txt_cari;
     private javax.swing.JTextField kembali_txt_cari;
+    private javax.swing.JPanel lap_kembali;
+    private javax.swing.JPanel lap_pendapatan;
+    private javax.swing.JPanel lap_pinjam;
+    private javax.swing.JPanel lap_restock;
+    private javax.swing.JPanel lap_vcd;
     private javax.swing.JPanel laporan;
     private javax.swing.JPanel left_panel;
     private javax.swing.JPanel lp_beranda;

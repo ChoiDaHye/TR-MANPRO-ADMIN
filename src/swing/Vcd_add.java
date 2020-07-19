@@ -1,11 +1,15 @@
 package swing;
 
 import dao.dao_vcd;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import models.m_vcd;
+import static swing.Vcd_restock.numberOrNot;
 
 public class Vcd_add extends javax.swing.JFrame {
 
@@ -55,6 +59,29 @@ public class Vcd_add extends javax.swing.JFrame {
         } catch (IOException e) {
             JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menyimpan data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
         }
+    }
+    
+    void acceptNUMBER(JTextField tf) {
+        tf.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent ke) {
+                char ch = ke.getKeyChar();
+                if (Character.isDigit(ch) || ke.getExtendedKeyCode() == KeyEvent.VK_SPACE || ke.getExtendedKeyCode() == KeyEvent.VK_BACK_SPACE || ke.getExtendedKeyCode() == KeyEvent.VK_DELETE) {
+                    tf.setEditable(true);
+                } else {
+                    tf.setEditable(false);
+                }
+            }
+        });
+    }
+
+    static boolean numberOrNot(String input) {
+        try {
+            Integer.parseInt(input);
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -165,6 +192,11 @@ public class Vcd_add extends javax.swing.JFrame {
 
         vcd_add_jumlah.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         vcd_add_jumlah.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
+        vcd_add_jumlah.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                vcd_add_jumlahKeyReleased(evt);
+            }
+        });
 
         jLabel9.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(93, 93, 93));
@@ -261,7 +293,7 @@ public class Vcd_add extends javax.swing.JFrame {
         String judul = vcd_add_judul.getText(), bahasa = vcd_add_bahasa.getText(), rilis = vcd_add_rilis.getText(), jumlah= vcd_add_jumlah.getText(), poster = vcd_add_poster.getText(), genre = vcd_add_genre.getText(), id_harga = "H0001";   
         int baik = Integer.parseInt(vcd_add_jumlah.getText()), buruk = 0;
         
-        if (judul.isEmpty() || bahasa.isEmpty() || rilis.isEmpty() || jumlah.isEmpty() || poster.isEmpty() || genre.isEmpty()) {
+        if (judul.isEmpty() || bahasa.isEmpty() || rilis.isEmpty() || jumlah.isEmpty() || poster.isEmpty() || genre.isEmpty() || !numberOrNot(jumlah)) {
             JOptionPane.showMessageDialog(null, "Mohon lengkapi data!", "Peringatan", JOptionPane.ERROR_MESSAGE);
 
             if (judul.isEmpty()) {
@@ -270,7 +302,8 @@ public class Vcd_add extends javax.swing.JFrame {
                 vcd_add_bahasa.requestFocus();
             } else if (rilis.isEmpty()) {
                 vcd_add_rilis.requestFocus();
-            } else if (jumlah.isEmpty()) {
+            } else if (jumlah.isEmpty() || !numberOrNot(jumlah)) {
+                vcd_add_jumlah.setText("");
                 vcd_add_jumlah.requestFocus();
             } else if (genre.isEmpty()) {
                 vcd_add_genre.requestFocus();
@@ -284,6 +317,10 @@ public class Vcd_add extends javax.swing.JFrame {
             }
         }
     }//GEN-LAST:event_vcd_btn_simpanMouseClicked
+
+    private void vcd_add_jumlahKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_vcd_add_jumlahKeyReleased
+        acceptNUMBER(vcd_add_jumlah);
+    }//GEN-LAST:event_vcd_add_jumlahKeyReleased
 
     /**
      * @param args the command line arguments

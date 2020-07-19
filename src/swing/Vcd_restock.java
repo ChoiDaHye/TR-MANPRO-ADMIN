@@ -1,11 +1,14 @@
 package swing;
 
 import dao.dao_vcd;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import javax.swing.JOptionPane;
+import javax.swing.JTextField;
 import models.m_vcd;
 import models.m_restock;
 
@@ -66,6 +69,29 @@ public class Vcd_restock extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Terjadi kesalahan saat menyimpan data!\n" + e, "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+    
+    void acceptNUMBER(JTextField tf) {
+        tf.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyPressed(KeyEvent ke) {
+                char ch = ke.getKeyChar();
+                if (Character.isDigit(ch) || ke.getExtendedKeyCode() == KeyEvent.VK_SPACE || ke.getExtendedKeyCode() == KeyEvent.VK_BACK_SPACE || ke.getExtendedKeyCode() == KeyEvent.VK_DELETE) {
+                    tf.setEditable(true);
+                } else {
+                    tf.setEditable(false);
+                }
+            }
+        });
+    }
+
+    static boolean numberOrNot(String input) {
+        try {
+            Integer.parseInt(input);
+        } catch (NumberFormatException ex) {
+            return false;
+        }
+        return true;
+    }
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -118,6 +144,11 @@ public class Vcd_restock extends javax.swing.JFrame {
 
         vcd_restock_add.setFont(new java.awt.Font("Segoe UI", 0, 14)); // NOI18N
         vcd_restock_add.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(96, 96, 96), 2));
+        vcd_restock_add.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                vcd_restock_addKeyReleased(evt);
+            }
+        });
 
         vcd_btn_simpan.setBackground(new java.awt.Color(0, 120, 215));
         vcd_btn_simpan.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -210,12 +241,21 @@ public class Vcd_restock extends javax.swing.JFrame {
 
     private void vcd_btn_simpanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_vcd_btn_simpanMouseClicked
         String baru = vcd_restock_add.getText();
-        if(baru.isEmpty()){
+        if(baru.isEmpty() || !numberOrNot(baru)){
+            vcd_restock_add.setText("");
             vcd_restock_add.requestFocus();
-        } else{
+        } else if(Integer.parseInt(baru) <= 0){
+            JOptionPane.showMessageDialog(null, "Input yang anda masukkan tidak diterima!", "kesalahan", JOptionPane.ERROR_MESSAGE);
+            vcd_restock_add.setText("");
+            vcd_restock_add.requestFocus();
+        } else{    
             restock(baru);
         }
     }//GEN-LAST:event_vcd_btn_simpanMouseClicked
+
+    private void vcd_restock_addKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_vcd_restock_addKeyReleased
+        acceptNUMBER(vcd_restock_add);
+    }//GEN-LAST:event_vcd_restock_addKeyReleased
 
     /**
      * @param args the command line arguments

@@ -41,7 +41,7 @@ public class dao_vcd {
 
                 if (rs != null) {
                     for (m_restock k : rs.getRestock()) {
-                        String id = k.getId_vcd();
+                        String id = k.getId_restock();
                         String tanggal = k.getTanggal();
                         int jumlah = k.getJumlah();
                         String vcd = k.getId_vcd();
