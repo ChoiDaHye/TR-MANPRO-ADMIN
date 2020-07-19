@@ -367,6 +367,10 @@ public class dao_laporan {
         myexcel.write();
         myexcel.close();
     }
+    
+    public void lap_pendapatan() throws IOException, WriteException {
+        
+    }
 
     public String getCus(String param) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
