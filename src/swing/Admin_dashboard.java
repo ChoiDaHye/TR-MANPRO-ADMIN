@@ -22,6 +22,11 @@ import models.m_karyawan;
 import models.m_pinjam;
 import models.m_pinjam_det;
 import models.m_vcd;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartFrame;
+import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.data.category.DefaultCategoryDataset;
 
 public class Admin_dashboard extends javax.swing.JFrame {
 
@@ -31,7 +36,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
     String d_id_vcd, d_id_customer, d_id_karyawan, d_id_harga, p_id_customer;
 
     //for indentity
-    String log_id, log_name, log_level, booking_id;
+    String log_id, log_name, log_level, booking_id, status;
 
     // METHOD PINJAM
     void pinjam_tampil() {
@@ -77,7 +82,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
 
     // METHOD KEMBALI
     void kembali_tampil() {
-        Object[] baris = {"KODE BOOKING", "CUSTOMER", "KARYAWAN", "TANGGAL", "JATUH TEMPO", "TOTAL HARGA"};
+        Object[] baris = {"KODE BOOKING", "CUSTOMER", "KARYAWAN", "TANGGAL", "JATUH TEMPO", "TOTAL HARGA", "STATUS"};
         DefaultTableModel dt = new DefaultTableModel(null, baris);
         tb_kembali.setModel(dt);
 
@@ -87,7 +92,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
 
             for (m_pinjam d : data) {
                 String total = Float.toString(d.getHarga_total());
-                String[] isi = {d.getId_pinjam(), dao.getCus(d.getId_customer()), dao.getKar(d.getId_karyawan()), d.getTgl_pinjam(), d.getJatuh_tempo(), total};
+                String[] isi = {d.getId_pinjam(), dao.getCus(d.getId_customer()), dao.getKar(d.getId_karyawan()), d.getTgl_pinjam(), d.getJatuh_tempo(), total, d.getStatus()};
                 dt.addRow(isi);
             }
         } catch (Exception e) {
@@ -98,6 +103,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
         int row = tb_kembali.getSelectedRow();
         String id_pinjam = tb_kembali.getModel().getValueAt(row, 0).toString();
         booking_id = tb_kembali.getModel().getValueAt(row, 0).toString();
+        status = tb_kembali.getModel().getValueAt(row, 6).toString();
 
         Object[] baris = {"ID VCD", "JUDUL", "JUMLAH", "KEMBALI"};
         DefaultTableModel dt = new DefaultTableModel(null, baris);
@@ -2708,10 +2714,10 @@ public class Admin_dashboard extends javax.swing.JFrame {
             }
         });
 
-        jLabel45.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/lap-profit.png"))); // NOI18N
+        jLabel45.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/lap-grap.png"))); // NOI18N
 
         jdhjashg.setFont(new java.awt.Font("Segoe UI", 0, 16)); // NOI18N
-        jdhjashg.setText("Pendapatan");
+        jdhjashg.setText("Grafik transaksi");
 
         javax.swing.GroupLayout lap_pendapatanLayout = new javax.swing.GroupLayout(lap_pendapatan);
         lap_pendapatan.setLayout(lap_pendapatanLayout);
@@ -2722,7 +2728,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                 .addGroup(lap_pendapatanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jdhjashg)
                     .addComponent(jLabel45))
-                .addContainerGap(89, Short.MAX_VALUE))
+                .addContainerGap(67, Short.MAX_VALUE))
         );
         lap_pendapatanLayout.setVerticalGroup(
             lap_pendapatanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2763,7 +2769,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                 .addGroup(lap_vcdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel67)
                     .addComponent(jLabel66))
-                .addContainerGap(45, Short.MAX_VALUE))
+                .addContainerGap(49, Short.MAX_VALUE))
         );
         lap_vcdLayout.setVerticalGroup(
             lap_vcdLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2804,7 +2810,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                 .addGroup(lap_restockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel70)
                     .addComponent(jLabel69))
-                .addContainerGap(60, Short.MAX_VALUE))
+                .addContainerGap(64, Short.MAX_VALUE))
         );
         lap_restockLayout.setVerticalGroup(
             lap_restockLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2845,7 +2851,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                 .addGroup(lap_pinjamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel73)
                     .addComponent(jLabel72))
-                .addContainerGap(23, Short.MAX_VALUE))
+                .addContainerGap(27, Short.MAX_VALUE))
         );
         lap_pinjamLayout.setVerticalGroup(
             lap_pinjamLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2886,7 +2892,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                 .addGroup(lap_kembaliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel76)
                     .addComponent(jLabel75))
-                .addContainerGap(11, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         lap_kembaliLayout.setVerticalGroup(
             lap_kembaliLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -2909,7 +2915,7 @@ public class Admin_dashboard extends javax.swing.JFrame {
                     .addComponent(jLabel16, javax.swing.GroupLayout.PREFERRED_SIZE, 700, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(laporanLayout.createSequentialGroup()
                         .addGroup(laporanLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                            .addComponent(lap_pendapatan, javax.swing.GroupLayout.DEFAULT_SIZE, 190, Short.MAX_VALUE)
+                            .addComponent(lap_pendapatan, javax.swing.GroupLayout.DEFAULT_SIZE, 194, Short.MAX_VALUE)
                             .addComponent(lap_kembali, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(10, 10, 10)
                         .addComponent(lap_vcd, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -3486,8 +3492,12 @@ public class Admin_dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_tb_pinjamMouseClicked
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
-        Trans_kembali kembali = new Trans_kembali(log_id, booking_id);
-        kembali.setVisible(true);
+        if (status.equals("Berjalan")) {
+            Trans_kembali kembali = new Trans_kembali(log_id, booking_id);
+            kembali.setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(null, "Transaksi sudah selesai!", "Kesalahan", JOptionPane.ERROR_MESSAGE);
+        }
     }//GEN-LAST:event_jButton4ActionPerformed
 
     private void tb_kembaliMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tb_kembaliMouseClicked
@@ -3495,7 +3505,11 @@ public class Admin_dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_tb_kembaliMouseClicked
 
     private void lap_pendapatanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_pendapatanMouseClicked
-        // TODO add your handling code here:
+        Laporan_grafik2 grafik = new Laporan_grafik2();
+        grafik.setVisible(true);
+
+//        Laporan_grafik grafik = new Laporan_grafik();
+//        grafik.setVisible(true);
     }//GEN-LAST:event_lap_pendapatanMouseClicked
 
     private void lap_pendapatanMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_pendapatanMouseEntered

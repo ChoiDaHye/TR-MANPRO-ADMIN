@@ -266,12 +266,12 @@ public class dao_laporan {
                 }
             }
         }
-        
+
         //EXECUTE FILE       
         myexcel.write();
         myexcel.close();
     }
-    
+
     public void lap_kembali() throws IOException, WriteException {
         //SET FILE AND DESTINATION        
         String date = new SimpleDateFormat("ddMMyyyy").format(new Date());
@@ -280,7 +280,7 @@ public class dao_laporan {
         File f = new File(System.getProperty("user.home") + "\\Documents\\vcd-data\\laporan\\pengembalian\\" + date + " - PENGEMBALIAN - " + random + ".xls");
         WritableWorkbook myexcel = Workbook.createWorkbook(f);
         WritableSheet mysheet = myexcel.createSheet(date2, 0);
-        
+
         //SET HEADER
         Label h1 = new Label(0, 0, "ID KEMBALI");
         Label h2 = new Label(1, 0, "ID PINJAM");
@@ -304,7 +304,7 @@ public class dao_laporan {
         mysheet.addCell(h9);
         mysheet.addCell(h10);
         mysheet.addCell(h11);
-        
+
         //SET DATA
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         BufferedReader br = null;
@@ -362,16 +362,20 @@ public class dao_laporan {
                 }
             }
         }
-        
+
         //EXECUTE FILE       
         myexcel.write();
         myexcel.close();
     }
-    
-    public void lap_pendapatan() throws IOException, WriteException {
-        
-    }
 
+    public List<String> lap_trans() {
+        List<String> data = new ArrayList<>();
+        
+        
+        
+        return data;
+    } 
+    
     public String getCus(String param) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         BufferedReader br = null;
@@ -460,5 +464,160 @@ public class dao_laporan {
         }
 
         return nama;
+    }
+
+    public List<String> getTahun() {
+        List<String> data = new ArrayList<>();
+
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        List<String> selesai = new ArrayList<>();
+        List<String> thn = new ArrayList<>();
+        BufferedReader br = null, br2 = null;
+
+        try {
+            String path = System.getProperty("user.home") + "\\Documents\\vcd-data\\data\\pinjam.json";
+            br = new BufferedReader(new FileReader(path));
+            m_pinjam_result rs = gson.fromJson(br, m_pinjam_result.class);
+
+            if (rs != null) {
+                for (m_pinjam k : rs.getPinjam()) {
+                    if (k.getStatus().equals("Selesai")) {
+                        selesai.add(k.getId_pinjam());
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+        try {
+            String path = System.getProperty("user.home") + "\\Documents\\vcd-data\\data\\kembali.json";
+            br2 = new BufferedReader(new FileReader(path));
+            m_kembali_result rs = gson.fromJson(br2, m_kembali_result.class);
+
+            if (rs != null) {
+                for (m_kembali k : rs.getKembali()) {
+                    String tahun = k.getTgl_kembali().substring(6);
+
+                    for (String l : selesai) {
+                        if (k.getId_pinjam().equals(l)) {
+                            thn.add(k.getTgl_kembali().substring(6));
+                        }
+                    }
+                }
+            }
+
+            for (String k : thn) {
+                if (data != null) {
+                    boolean cp = false;
+                    for (String l : data) {
+                        if (l.equals(k)) {
+                            cp = true;
+                        }
+                    }
+
+                    if (!cp) {
+                        data.add(k);
+                    }
+                } else {
+                    data.add(k);
+                }
+            }
+        } catch (FileNotFoundException e) {
+        } finally {
+            if (br2 != null) {
+                try {
+                    br2.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+        return data;
+    }
+
+    public void lap_pendapatan(String bulan, String tahun) throws IOException, WriteException {
+        //SET FILE AND DESTINATION        
+        String date = new SimpleDateFormat("ddMMyyyy").format(new Date());
+        String date2 = new SimpleDateFormat("dd-MMMM-yyyy").format(new Date());
+        String random = UUID.randomUUID().toString();
+        File f = new File(System.getProperty("user.home") + "\\Documents\\vcd-data\\laporan\\pendapatan\\" + date + " - PENDAPATAN - " + random + ".xls");
+        WritableWorkbook myexcel = Workbook.createWorkbook(f);
+        WritableSheet mysheet = myexcel.createSheet(date2, 0);
+
+        //SET HEADER
+        Label h1 = new Label(0, 0, "ID TRANSAKSI");
+        Label h2 = new Label(1, 0, "TANGGAL TRANSAKSI");
+        Label h3 = new Label(2, 0, "HARGA");
+        Label h4 = new Label(3, 0, "DENDA");
+        Label h5 = new Label(4, 0, "TOTAL");
+        mysheet.addCell(h1);
+        mysheet.addCell(h2);
+        mysheet.addCell(h3);
+        mysheet.addCell(h4);
+        mysheet.addCell(h5);
+
+        //SET DATA
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        BufferedReader br = null;
+
+        try {
+            String path = System.getProperty("user.home") + "\\Documents\\vcd-data\\data\\pinjam.json";
+            String path2 = System.getProperty("user.home") + "\\Documents\\vcd-data\\data\\kembali.json";
+            br = new BufferedReader(new FileReader(path));
+            m_pinjam_result rs = gson.fromJson(br, m_pinjam_result.class);
+
+            br = new BufferedReader(new FileReader(path2));
+            m_kembali_result rs2 = gson.fromJson(br, m_kembali_result.class);
+            int i = 1;
+
+            if (rs != null) {
+                for (m_pinjam k : rs.getPinjam()) {
+                    String tgl = bulan + "/" + tahun;
+                    String k_tgl = k.getTgl_pinjam().substring(3);
+
+                    if (k_tgl.equals(tgl)) {
+                        float t_denda = 0;
+
+                        if (rs2 != null) {
+                            for (m_kembali l : rs2.getKembali()) {
+                                if (l.getId_pinjam().equals(k.getId_pinjam())) {
+                                    t_denda += l.getDenda_total();
+                                }
+                            }
+                        }
+
+                        Label d1 = new Label(0, i, k.getId_pinjam());
+                        Label d2 = new Label(1, i, k.getTgl_pinjam());
+                        Label d3 = new Label(2, i, Float.toString(k.getHarga_total()));
+                        Label d4 = new Label(3, i, Float.toString(t_denda));
+                        Label d5 = new Label(4, i, Float.toString(k.getHarga_total() + t_denda));
+                        mysheet.addCell(d1);
+                        mysheet.addCell(d2);
+                        mysheet.addCell(d3);
+                        mysheet.addCell(d4);
+                        mysheet.addCell(d5);
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+        //EXECUTE FILE       
+        myexcel.write();
+        myexcel.close();
     }
 }

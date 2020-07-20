@@ -605,6 +605,7 @@ public class Trans_kembali extends javax.swing.JFrame {
             kembali_txt_bayar.requestFocus();
         } else{
             simpan_trans(kembali_txt_code.getText(), Float.parseFloat(kembali_txt_bayar.getText()));
+            
         }
     }//GEN-LAST:event_kembali_btn_proses1MouseClicked
 

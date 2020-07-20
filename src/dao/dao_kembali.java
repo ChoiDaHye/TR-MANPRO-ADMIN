@@ -128,6 +128,7 @@ public class dao_kembali {
                 gson.toJson(rs, writer);
                 updateVCD(newid_vcd, newjumlah, newrusak);
                 updatePinjamDet(id, newid_vcd, newjumlah);
+                updatePinjam(id);
             } catch (Exception e) {
             }
 
@@ -159,7 +160,7 @@ public class dao_kembali {
                     if (k.getId_vcd().equals(id)) {
                         int newpj = k.getTerpinjam() - jm;
                         int newrk = k.getKondisi_buruk() + rk;
-                        int newbg = k.getKondisi_buruk() - rk;
+                        int newbg = k.getKondisi_baik()- rk;
                         data.add(new m_vcd(id, k.getJudul(), k.getGenre(), k.getBahasa(), k.getPoster(), k.getId_harga(), k.getRilis(), newbg, newrk, newpj));
                     } else {
                         data.add(new m_vcd(k.getId_vcd(), k.getJudul(), k.getGenre(), k.getBahasa(), k.getPoster(), k.getId_harga(), k.getRilis(), k.getKondisi_baik(), k.getKondisi_buruk(), k.getTerpinjam()));
@@ -210,7 +211,6 @@ public class dao_kembali {
             rs = new m_pinjam_det_result(data);
             try (Writer writer = new FileWriter(detl)) {
                 gson.toJson(rs, writer);
-                updatePinjam(id);
             } catch (Exception e) {
             }
         } catch (FileNotFoundException e) {
@@ -226,31 +226,67 @@ public class dao_kembali {
         return false;
     }
 
-    public boolean updatePinjam(String id) throws IOException {
+    public boolean updatePinjam(String id) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         BufferedReader br = null;
+        int j = 0, b = 0;
 
         try {
             br = new BufferedReader(new FileReader(detl));
             m_pinjam_det_result rs = gson.fromJson(br, m_pinjam_det_result.class);
 
-            System.out.println(id);
             if (rs != null) {
                 for (m_pinjam_det k : rs.getPinjam_det()) {
                     if (k.getId_pinjam().equals(id)) {
-                        System.out.println(k.getId_pinjam() + " " + k.getId_vcd() + " " + k.getJumlah() + " " + k.getSubtotal() + " " + k.getKembali());
+                        j++;
+                        if (k.getJumlah() == k.getKembali()) {
+                            b++;
+                        }
                     }
                 }
-            } else {
-                System.out.println("Kosong " + rs);
+            }
+            if (j == b && j != 0) {
+                updateStatus(id);
             }
 
-//            rs = new m_pinjam_det_result(data);
-//            try (Writer writer = new FileWriter(detl);) {
-//                gson.toJson(rs, writer);
-//                updatePinjam(id);
-//            } catch (Exception e) {
-//            }
+            return true;
+        } catch (FileNotFoundException e) {
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public boolean updateStatus(String id) {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        BufferedReader br = null;
+
+        try {
+            br = new BufferedReader(new FileReader(pinjam));
+            m_pinjam_result rs = gson.fromJson(br, m_pinjam_result.class);
+            List<m_pinjam> data = new ArrayList<m_pinjam>();
+
+            if (rs != null) {
+                for (m_pinjam k : rs.getPinjam()) {
+                    if (k.getId_pinjam().equals(id)) {
+                        data.add(new m_pinjam(k.getId_pinjam(), k.getTgl_pinjam(), k.getJatuh_tempo(), k.getHarga_total(), "Selesai", k.getId_customer(), k.getId_karyawan()));
+                    } else {
+                        data.add(new m_pinjam(k.getId_pinjam(), k.getTgl_pinjam(), k.getJatuh_tempo(), k.getHarga_total(), k.getStatus(), k.getId_customer(), k.getId_karyawan()));
+                    }
+                }
+            }
+            rs = new m_pinjam_result(data);
+            try (Writer writer = new FileWriter(pinjam)) {
+                gson.toJson(rs, writer);
+            } catch (Exception e) {
+            }
+            return true;
         } catch (FileNotFoundException e) {
         } finally {
             if (br != null) {
@@ -275,9 +311,7 @@ public class dao_kembali {
 
             if (rs != null) {
                 for (m_pinjam k : rs.getPinjam()) {
-                    if (k.getStatus().equals("Berjalan")) {
-                        data.add(new m_pinjam(k.getId_pinjam(), k.getTgl_pinjam(), k.getJatuh_tempo(), k.getHarga_total(), k.getStatus(), k.getId_customer(), k.getId_karyawan()));
-                    }
+                    data.add(new m_pinjam(k.getId_pinjam(), k.getTgl_pinjam(), k.getJatuh_tempo(), k.getHarga_total(), k.getStatus(), k.getId_customer(), k.getId_karyawan()));
                 }
             }
         } catch (FileNotFoundException e) {
