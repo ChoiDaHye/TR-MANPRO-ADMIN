@@ -8,7 +8,12 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
@@ -368,14 +373,80 @@ public class dao_laporan {
         myexcel.close();
     }
 
-    public List<String> lap_trans() {
-        List<String> data = new ArrayList<>();
-        
-        
-        
-        return data;
-    } 
-    
+    public String[][] lap_trans(String bulan, String tahun) {
+        //AMBIL SEMUA HARI SENIN
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        LocalDate start = LocalDate.parse("01/" + bulan + "/" + tahun, formatter);
+        LocalDate end = LocalDate.parse("01/" + bulan + "/" + tahun, formatter).with(TemporalAdjusters.lastDayOfMonth());
+
+        List<LocalDate> senin = new ArrayList<>();
+        LocalDate Senin = start.with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
+
+        while (Senin.isBefore(end)) {
+            senin.add(Senin);
+            Senin = Senin.plusWeeks(1);
+        }
+
+        //AMBIL BANYAK MINGGU
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, 2020);
+        cal.set(Calendar.DAY_OF_MONTH, 1);
+        cal.set(Calendar.MONTH, 6);
+        int minggu = cal.getActualMaximum(Calendar.WEEK_OF_MONTH);
+
+        String[][] total = new String[minggu][2];
+        for (int i = 0; i < minggu; i++) {
+            total[i][0] = "Minggu ke-" + (i + 1);
+            total[i][1] = "0";
+        }
+
+        //GET DATA
+        String path = System.getProperty("user.home") + "\\Documents\\vcd-data\\data\\pinjam.json";
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        BufferedReader br = null;
+
+        try {
+            br = new BufferedReader(new FileReader(path));
+            m_pinjam_result rs = gson.fromJson(br, m_pinjam_result.class);
+
+            if (rs != null) {
+                for (m_pinjam k : rs.getPinjam()) {
+                    LocalDate ini = LocalDate.parse(k.getTgl_pinjam(), formatter);
+
+                    if (ini.equals(start) || (ini.isAfter(start) && ini.isBefore(senin.get(0)))) {
+                        int get = Integer.parseInt(total[0][1]);
+                        get += 1;
+                        total[0][1] = Integer.toString(get);
+                    } else if (ini.equals(end)) {
+                        int get = Integer.parseInt(total[minggu - 1][1]);
+                        get += 1;
+                        total[minggu - 1][1] = Integer.toString(get);
+                    } else {
+                        int i = 1;
+                        for (LocalDate l : senin) {
+                            if ((ini.isEqual(l) || ini.isAfter(l)) && ini.isBefore(l.plusWeeks(1))) {
+                                int get = Integer.parseInt(total[i][1]);
+                                get += 1;
+                                total[i][1] = Integer.toString(get);
+                            }
+                            i++;
+                        }
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                }
+            }
+        }
+
+        return total;
+    }
+
     public String getCus(String param) {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         BufferedReader br = null;

@@ -41,24 +41,24 @@ public class Laporan_grafik2 extends javax.swing.JFrame {
         cmb_tahun.setSelectedItem(thn);
     }
 
-    void tampilGrafik() {
+    void tampilGrafik(String bulan, String tahun, String bln) {
+        dao_laporan dao = new dao_laporan();
+        String[][] data = dao.lap_trans(bulan, tahun);
+        
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        dataset.addValue(15, "schools", "1970");
-        dataset.addValue(30, "schools", "1980");
-        dataset.addValue(60, "schools", "1990");
-        dataset.addValue(120, "schools", "2000");
-        dataset.addValue(240, "schools", "2010");
-        dataset.addValue(300, "schools", "2014");
+        
+        for (int i = 0; i < data.length; i++) {
+            dataset.addValue(Integer.parseInt(data[i][1]), "Banyak Transaksi", data[i][0]);
+        }
 
-        JFreeChart chart = ChartFactory.createLineChart("", "", "Values", dataset);
+        JFreeChart chart = ChartFactory.createLineChart("", "", "Transaksi", dataset);
         chart.setBackgroundPaint(Color.WHITE);
         chart.getTitle().setPaint(Color.BLUE);
         CategoryPlot p = chart.getCategoryPlot();
         p.setRangeGridlinePaint(Color.BLUE);
-        ChartFrame frame = new ChartFrame("Banyaknya Transaksi yang terjadi", chart);
+        ChartFrame frame = new ChartFrame("TRANSAKSI PADA " + bln + " " + tahun, chart);
         frame.setVisible(true);
         frame.setSize(800, 600);
-
     }
 
     /**
@@ -144,7 +144,10 @@ public class Laporan_grafik2 extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        tampilGrafik();
+        String bulan = String.format("%02d", cmb_bulan.getSelectedIndex() + 1);
+        String bln = cmb_bulan.getSelectedItem().toString();
+        String tahun = cmb_tahun.getSelectedItem().toString();
+        tampilGrafik(bulan, tahun, bln);
     }//GEN-LAST:event_jButton2ActionPerformed
 
     /**
