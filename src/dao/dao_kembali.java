@@ -3,6 +3,7 @@ package dao;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -44,6 +45,7 @@ public class dao_kembali {
     private String cust = System.getProperty("user.home") + "\\Documents\\vcd-data\\data\\customer.json";
     private String vcd = System.getProperty("user.home") + "\\Documents\\vcd-data\\data\\vcd.json";
     private String hrg = System.getProperty("user.home") + "\\Documents\\vcd-data\\data\\harga.json";
+    private String skbl = System.getProperty("user.home") + "\\Documents\\vcd-data\\struk\\pengembalian\\";
 
     public boolean simpanTrans(m_kembali gs) throws IOException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
@@ -551,5 +553,67 @@ public class dao_kembali {
         }
 
         return denda;
+    }
+    
+    public void struk(String param, float nom) throws IOException, ParseException {
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        BufferedReader br1 = null, br2 = null;
+        float hrg = 0;
+
+        try {
+            br1 = new BufferedReader(new FileReader(path));
+            br2 = new BufferedReader(new FileReader(detl2));
+            m_kembali_result rs1 = gson.fromJson(br1, m_kembali_result.class); 
+            m_kembali_det_result rs2 = gson.fromJson(br2, m_kembali_det_result.class);
+
+            if (rs1 != null) {
+                for (m_kembali k : rs1.getKembali()) {
+                    if (k.getId_kembali().equals(param)) {
+                        BufferedWriter bw = new BufferedWriter(new FileWriter(skbl + param + ".txt"));
+
+                        bw.write("###############################################");bw.newLine();
+                        bw.write("                  Home Cinema                  ");bw.newLine();bw.newLine();
+                        bw.write("No. Transaksi: " + k.getId_kembali());bw.newLine();
+                        bw.write("Kode Booking : " + k.getId_pinjam());bw.newLine();
+                        bw.write("Karyawan     : " + getKar(k.getId_karyawan()));bw.newLine();
+                        bw.write("Tanggal      : " + k.getTgl_kembali().replace('/', '-'));bw.newLine();
+                        bw.write("===============================================");bw.newLine();
+                        bw.write("ID VCD   QTY   RUSAK   SUBTOTAL   JUDUL");bw.newLine();
+                        bw.write("===============================================");bw.newLine();
+                        if (rs2 != null) {
+                            for (m_kembali_det l : rs2.getKembali_det()) {
+                                if (l.getId_kembali().equals(k.getId_kembali())) {
+                                    bw.write(l.getId_vcd() + "     " + l.getJumlah() + "     " + l.getKondisi_rusak() + "     " + l.getDenda() + "    " + getJudul(l.getId_vcd()));bw.newLine();
+                                }
+                            }
+                        }
+                        bw.write("===============================================");bw.newLine();
+                        bw.write("TERLAMBAT             " + getDtelat(k.getId_pinjam()));bw.newLine();
+                        bw.write("===============================================");bw.newLine();
+                        bw.write("TOTAL                 " + k.getDenda_total());bw.newLine();
+                        bw.write("BAYAR                 " + nom);bw.newLine();
+                        bw.write("KEMBALI               " + (nom - k.getDenda_total()));bw.newLine();bw.newLine();
+                        bw.write("###############################################");
+                        bw.close();                        
+                    }
+                }
+            }
+        } catch (FileNotFoundException e) {
+        } finally {
+            if (br1 != null || br2 != null) {
+                try {
+                    br1.close();
+                    br2.close();
+                } catch (IOException e) {
+                }
+            }
+
+            if (br2 != null) {
+                try {
+                    br2.close();
+                } catch (IOException e) {
+                }
+            }
+        }
     }
 }

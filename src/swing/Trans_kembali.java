@@ -174,7 +174,7 @@ public class Trans_kembali extends javax.swing.JFrame {
             if (c1 && c2) {
                 JOptionPane.showMessageDialog(null, "Transaksi berhasil!", "Berhasil", JOptionPane.INFORMATION_MESSAGE);
                 JOptionPane.showMessageDialog(null, "Kembalian \nRp. " + (bayar - d_total), "Info", JOptionPane.INFORMATION_MESSAGE);
-//                dao.struk(kb, by);
+                dao.struk(code, bayar);
                 this.dispose();
             } else {
                 JOptionPane.showMessageDialog(null, "Maaf, transaksi gagal!", "Gagal", JOptionPane.ERROR_MESSAGE);
