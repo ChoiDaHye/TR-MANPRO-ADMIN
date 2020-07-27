@@ -51,7 +51,7 @@ public class Laporan_grafik2 extends javax.swing.JFrame {
             dataset.addValue(Integer.parseInt(data[i][1]), "Banyak Transaksi", data[i][0]);
         }
 
-        JFreeChart chart = ChartFactory.createLineChart("", "", "Transaksi", dataset);
+        JFreeChart chart = ChartFactory.createBarChart("", "", "Transaksi", dataset);
         chart.setBackgroundPaint(Color.WHITE);
         chart.getTitle().setPaint(Color.BLUE);
         CategoryPlot p = chart.getCategoryPlot();
