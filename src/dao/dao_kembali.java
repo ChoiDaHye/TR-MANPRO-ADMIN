@@ -507,7 +507,7 @@ public class dao_kembali {
                             if (rs2 != null) {
                                 for (m_harga l : rs2.getHarga()) {
                                     if (l.getIdHarga().equals("H0002")) {
-                                        denda = l.getHarga() * ((n * -1) + 1);                                        
+                                        denda = l.getHarga() * ((n * -1));                                        
                                     }
                                 }
                             }
