@@ -23,17 +23,8 @@ public class Login extends javax.swing.JFrame {
      * Creates new form login
      */
     public Login() {
-        dao_awal dao = new dao_awal();
-        boolean cek_induk = dao.cek_induk();
-
-        if (!cek_induk) {
-            Awal_karyawan ak = new Awal_karyawan();
-            ak.setVisible(true);
-            this.dispose();
-        } else {
-            initComponents();
-            jPanel1.setFocusable(true);
-        }
+        initComponents();
+        jPanel1.setFocusable(true);
     }
 
     void login(String user, String pass) {
