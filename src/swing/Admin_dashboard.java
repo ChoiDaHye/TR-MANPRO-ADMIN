@@ -3505,11 +3505,8 @@ public class Admin_dashboard extends javax.swing.JFrame {
     }//GEN-LAST:event_tb_kembaliMouseClicked
 
     private void lap_pendapatanMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_pendapatanMouseClicked
-        Laporan_grafik2 grafik = new Laporan_grafik2();
+        Laporan_grafik grafik = new Laporan_grafik();
         grafik.setVisible(true);
-
-//        Laporan_grafik grafik = new Laporan_grafik();
-//        grafik.setVisible(true);
     }//GEN-LAST:event_lap_pendapatanMouseClicked
 
     private void lap_pendapatanMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_lap_pendapatanMouseEntered

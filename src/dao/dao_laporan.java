@@ -389,9 +389,9 @@ public class dao_laporan {
 
         //AMBIL BANYAK MINGGU
         Calendar cal = Calendar.getInstance();
-        cal.set(Calendar.YEAR, 2020);
+        cal.set(Calendar.YEAR, Integer.parseInt(tahun));
         cal.set(Calendar.DAY_OF_MONTH, 1);
-        cal.set(Calendar.MONTH, 6);
+        cal.set(Calendar.MONTH, Integer.parseInt(bulan)-1);
         int minggu = cal.getActualMaximum(Calendar.WEEK_OF_MONTH);
 
         String[][] total = new String[minggu][2];

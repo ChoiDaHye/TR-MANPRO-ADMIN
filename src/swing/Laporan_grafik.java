@@ -41,24 +41,24 @@ public class Laporan_grafik extends javax.swing.JFrame {
         cmb_tahun.setSelectedItem(thn);
     }
 
-    void tampilGrafik() {
+    void tampilGrafik(String bulan, String tahun, String bln) {
+        dao_laporan dao = new dao_laporan();
+        String[][] data = dao.lap_trans(bulan, tahun);
+        
         DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-        dataset.addValue(15, "schools", "1970");
-        dataset.addValue(30, "schools", "1980");
-        dataset.addValue(60, "schools", "1990");
-        dataset.addValue(120, "schools", "2000");
-        dataset.addValue(240, "schools", "2010");
-        dataset.addValue(300, "schools", "2014");
+        
+        for (int i = 0; i < data.length; i++) {
+            dataset.addValue(Integer.parseInt(data[i][1]), "Banyak Transaksi", data[i][0]);
+        }
 
-        JFreeChart chart = ChartFactory.createLineChart("", "", "Values", dataset);
+        JFreeChart chart = ChartFactory.createBarChart("", "", "Transaksi", dataset);
         chart.setBackgroundPaint(Color.WHITE);
         chart.getTitle().setPaint(Color.BLUE);
         CategoryPlot p = chart.getCategoryPlot();
         p.setRangeGridlinePaint(Color.BLUE);
-        ChartFrame frame = new ChartFrame("Banyaknya Transaksi yang terjadi", chart);
+        ChartFrame frame = new ChartFrame("TRANSAKSI PADA " + bln + " " + tahun, chart);
         frame.setVisible(true);
         frame.setSize(800, 600);
-
     }
 
     /**
@@ -74,7 +74,6 @@ public class Laporan_grafik extends javax.swing.JFrame {
         cmb_bulan = new javax.swing.JComboBox<>();
         cmb_tahun = new javax.swing.JComboBox<>();
         jLabel1 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
         jButton2 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
 
@@ -85,13 +84,6 @@ public class Laporan_grafik extends javax.swing.JFrame {
         cmb_bulan.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "JANUARI", "FEBRUARI", "MARET", "APRIL", "MEI", "JUNI", "JULI", "AGUSTUS", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DESEMBER" }));
 
         jLabel1.setText("Tahun");
-
-        jButton1.setText("LAPORAN");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
-            }
-        });
 
         jButton2.setText("GRAFIK");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -113,12 +105,9 @@ public class Laporan_grafik extends javax.swing.JFrame {
                     .addComponent(jLabel2))
                 .addGap(30, 30, 30)
                 .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addGroup(jPanel1Layout.createSequentialGroup()
-                        .addComponent(jButton2)
-                        .addGap(10, 10, 10)
-                        .addComponent(jButton1))
                     .addComponent(cmb_tahun, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(cmb_bulan, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(cmb_bulan, 0, 202, Short.MAX_VALUE)
+                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addGap(30, 30, 30))
         );
         jPanel1Layout.setVerticalGroup(
@@ -133,13 +122,9 @@ public class Laporan_grafik extends javax.swing.JFrame {
                     .addComponent(jLabel1)
                     .addComponent(cmb_tahun, javax.swing.GroupLayout.PREFERRED_SIZE, 42, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(15, 15, 15)
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
-                    .addComponent(jButton1)
-                    .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(jButton2, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(30, 30, 30))
         );
-
-        jPanel1Layout.linkSize(javax.swing.SwingConstants.VERTICAL, new java.awt.Component[] {jButton1, jButton2});
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -159,19 +144,11 @@ public class Laporan_grafik extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        tampilGrafik();
+        String bulan = String.format("%02d", cmb_bulan.getSelectedIndex() + 1);
+        String bln = cmb_bulan.getSelectedItem().toString();
+        String tahun = cmb_tahun.getSelectedItem().toString();
+        tampilGrafik(bulan, tahun, bln);
     }//GEN-LAST:event_jButton2ActionPerformed
-
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        dao_laporan dao = new dao_laporan();
-        try {
-            dao.lap_pendapatan(String.format("%02d", cmb_bulan.getSelectedIndex() + 1), cmb_tahun.getSelectedItem().toString());
-        } catch (IOException ex) {
-            Logger.getLogger(Laporan_grafik.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (WriteException ex) {
-            Logger.getLogger(Laporan_grafik.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
      * @param args the command line arguments
@@ -199,6 +176,9 @@ public class Laporan_grafik extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(Laporan_grafik.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -211,7 +191,6 @@ public class Laporan_grafik extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cmb_bulan;
     private javax.swing.JComboBox<String> cmb_tahun;
-    private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;

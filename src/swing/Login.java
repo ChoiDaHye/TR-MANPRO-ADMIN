@@ -1,5 +1,6 @@
 package swing;
 
+import dao.dao_awal;
 import dao.dao_karyawan;
 import java.awt.Color;
 import java.io.BufferedReader;
@@ -22,20 +23,29 @@ public class Login extends javax.swing.JFrame {
      * Creates new form login
      */
     public Login() {
-        initComponents();
-        jPanel1.setFocusable(true);
+        dao_awal dao = new dao_awal();
+        boolean cek_induk = dao.cek_induk();
+
+        if (!cek_induk) {
+            Awal_karyawan ak = new Awal_karyawan();
+            ak.setVisible(true);
+            this.dispose();
+        } else {
+            initComponents();
+            jPanel1.setFocusable(true);
+        }
     }
 
     void login(String user, String pass) {
         try {
             dao_karyawan dao = new dao_karyawan();
             m_karyawan m = new m_karyawan();
-            
+
             m.setUsername(user);
             m.setPassword(pass);
-            
+
             List<m_karyawan> data = dao.login(m);
-            
+
             if (data != null && !data.isEmpty()) {
                 for (m_karyawan d : data) {
                     String id = d.getIdKaryawan(), nama = d.getNama(), level = d.getLevel();

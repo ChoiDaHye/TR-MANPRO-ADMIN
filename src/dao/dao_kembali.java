@@ -15,6 +15,10 @@ import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -162,7 +166,7 @@ public class dao_kembali {
                     if (k.getId_vcd().equals(id)) {
                         int newpj = k.getTerpinjam() - jm;
                         int newrk = k.getKondisi_buruk() + rk;
-                        int newbg = k.getKondisi_baik()- rk;
+                        int newbg = k.getKondisi_baik() - rk;
                         data.add(new m_vcd(id, k.getJudul(), k.getGenre(), k.getBahasa(), k.getPoster(), k.getId_harga(), k.getRilis(), newbg, newrk, newpj));
                     } else {
                         data.add(new m_vcd(k.getId_vcd(), k.getJudul(), k.getGenre(), k.getBahasa(), k.getPoster(), k.getId_harga(), k.getRilis(), k.getKondisi_baik(), k.getKondisi_buruk(), k.getTerpinjam()));
@@ -479,8 +483,8 @@ public class dao_kembali {
 
     public float getDtelat(String param) throws ParseException {
         float denda = 0;
-        DateFormat format = new SimpleDateFormat("dd/MM/yyyy");
-        String date = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
+        DateTimeFormatter format = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        String tgl = new SimpleDateFormat("dd/MM/yyyy").format(new Date());
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         BufferedReader br = null, br2 = null;
@@ -491,20 +495,19 @@ public class dao_kembali {
 
             if (rs != null) {
                 for (m_pinjam k : rs.getPinjam()) {
-                    Date jatuh_tempo = format.parse(k.getJatuh_tempo());
-                    Date hari_ini = format.parse(date);
-
                     if (k.getId_pinjam().equals(param)) {
-                        int n = hari_ini.compareTo(jatuh_tempo);
-
-                        if (n > 0) {
+                        LocalDate date = LocalDate.parse(tgl, format);
+                        LocalDate jtp = LocalDate.parse(k.getJatuh_tempo(), format);
+                        long n = ChronoUnit.DAYS.between(date, jtp);
+                        
+                        if (n < 0) {
                             br2 = new BufferedReader(new FileReader(hrg));
                             m_harga_result rs2 = gson.fromJson(br2, m_harga_result.class);
 
                             if (rs2 != null) {
                                 for (m_harga l : rs2.getHarga()) {
                                     if (l.getIdHarga().equals("H0002")) {
-                                        denda = l.getHarga() * (n + 1);
+                                        denda = l.getHarga() * ((n * -1) + 1);                                        
                                     }
                                 }
                             }
@@ -554,7 +557,7 @@ public class dao_kembali {
 
         return denda;
     }
-    
+
     public void struk(String param, float nom) throws IOException, ParseException {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         BufferedReader br1 = null, br2 = null;
@@ -563,7 +566,7 @@ public class dao_kembali {
         try {
             br1 = new BufferedReader(new FileReader(path));
             br2 = new BufferedReader(new FileReader(detl2));
-            m_kembali_result rs1 = gson.fromJson(br1, m_kembali_result.class); 
+            m_kembali_result rs1 = gson.fromJson(br1, m_kembali_result.class);
             m_kembali_det_result rs2 = gson.fromJson(br2, m_kembali_det_result.class);
 
             if (rs1 != null) {
@@ -571,30 +574,48 @@ public class dao_kembali {
                     if (k.getId_kembali().equals(param)) {
                         BufferedWriter bw = new BufferedWriter(new FileWriter(skbl + param + ".txt"));
 
-                        bw.write("###############################################");bw.newLine();
-                        bw.write("                  Home Cinema                  ");bw.newLine();bw.newLine();
-                        bw.write("No. Transaksi: " + k.getId_kembali());bw.newLine();
-                        bw.write("Kode Booking : " + k.getId_pinjam());bw.newLine();
-                        bw.write("Karyawan     : " + getKar(k.getId_karyawan()));bw.newLine();
-                        bw.write("Tanggal      : " + k.getTgl_kembali().replace('/', '-'));bw.newLine();
-                        bw.write("===============================================");bw.newLine();
-                        bw.write("ID VCD   QTY   RUSAK   SUBTOTAL   JUDUL");bw.newLine();
-                        bw.write("===============================================");bw.newLine();
+                        bw.write("###############################################");
+                        bw.newLine();
+                        bw.write("                  Home Cinema                  ");
+                        bw.newLine();
+                        bw.newLine();
+                        bw.write("No. Transaksi: " + k.getId_kembali());
+                        bw.newLine();
+                        bw.write("Kode Booking : " + k.getId_pinjam());
+                        bw.newLine();
+                        bw.write("Karyawan     : " + getKar(k.getId_karyawan()));
+                        bw.newLine();
+                        bw.write("Tanggal      : " + k.getTgl_kembali().replace('/', '-'));
+                        bw.newLine();
+                        bw.write("===============================================");
+                        bw.newLine();
+                        bw.write("ID VCD   QTY   RUSAK   SUBTOTAL   JUDUL");
+                        bw.newLine();
+                        bw.write("===============================================");
+                        bw.newLine();
                         if (rs2 != null) {
                             for (m_kembali_det l : rs2.getKembali_det()) {
                                 if (l.getId_kembali().equals(k.getId_kembali())) {
-                                    bw.write(l.getId_vcd() + "     " + l.getJumlah() + "     " + l.getKondisi_rusak() + "     " + l.getDenda() + "    " + getJudul(l.getId_vcd()));bw.newLine();
+                                    bw.write(l.getId_vcd() + "     " + l.getJumlah() + "     " + l.getKondisi_rusak() + "     " + l.getDenda() + "    " + getJudul(l.getId_vcd()));
+                                    bw.newLine();
                                 }
                             }
                         }
-                        bw.write("===============================================");bw.newLine();
-                        bw.write("TERLAMBAT             " + getDtelat(k.getId_pinjam()));bw.newLine();
-                        bw.write("===============================================");bw.newLine();
-                        bw.write("TOTAL                 " + k.getDenda_total());bw.newLine();
-                        bw.write("BAYAR                 " + nom);bw.newLine();
-                        bw.write("KEMBALI               " + (nom - k.getDenda_total()));bw.newLine();bw.newLine();
+                        bw.write("===============================================");
+                        bw.newLine();
+                        bw.write("TERLAMBAT             " + getDtelat(k.getId_pinjam()));
+                        bw.newLine();
+                        bw.write("===============================================");
+                        bw.newLine();
+                        bw.write("TOTAL                 " + k.getDenda_total());
+                        bw.newLine();
+                        bw.write("BAYAR                 " + nom);
+                        bw.newLine();
+                        bw.write("KEMBALI               " + (nom - k.getDenda_total()));
+                        bw.newLine();
+                        bw.newLine();
                         bw.write("###############################################");
-                        bw.close();                        
+                        bw.close();
                     }
                 }
             }
